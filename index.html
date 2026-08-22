@@ -841,11 +841,13 @@
     document.body.scrollTop = 0;
     if(el){
       el.scrollTop = 0;
-      // pin the screen's height to the real, current visual viewport —
-      // a defensive measure against any stale/mismatched viewport size
-      // left over from a mobile keyboard opening/closing.
-      const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      el.style.height = vh + 'px';
+      // NOTE: previously this also force-set el.style.height from
+      // visualViewport.height as a "safety net". That turned out to be the
+      // actual cause of a worse blank-space bug — reading the viewport height
+      // at the wrong moment (mid keyboard-close animation) froze the screen
+      // at a wrong size via inline style, fighting the already-correct
+      // position:fixed + inset:0 sizing. Removed.
+      el.style.height = '';
     }
   }
   function showScreen(el){
@@ -882,6 +884,28 @@
     window.visualViewport.addEventListener('scroll', onViewportChange);
   }
 
+  // BUGFIX: instead of guessing a fixed delay for the keyboard-close animation
+  // (which varies by device and was still too short on some phones), wait for
+  // the visualViewport to actually stop resizing before switching screens.
+  function afterKeyboardCloses(callback){
+    if(!window.visualViewport){ setTimeout(callback, 300); return; }
+    let settleTimer = null;
+    let done = false;
+    function finish(){
+      if(done) return;
+      done = true;
+      window.visualViewport.removeEventListener('resize', onResize);
+      callback();
+    }
+    function onResize(){
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(finish, 120);
+    }
+    window.visualViewport.addEventListener('resize', onResize);
+    settleTimer = setTimeout(finish, 120);
+    setTimeout(finish, 700); // hard fallback in case no resize event ever fires
+  }
+
   nextBtn.addEventListener('click', ()=>{
     const val = nameInput.value.trim();
     if(!val){
@@ -893,14 +917,14 @@
     }
     enteredName = val;
     nameInput.blur();
-    setTimeout(()=> showScreen(reasonScreen), 300);
+    afterKeyboardCloses(()=> showScreen(reasonScreen));
   });
   nameInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') nextBtn.click(); });
 
   reasonNextBtn.addEventListener('click', ()=>{
     enteredReason = reasonInput.value.trim();
     reasonInput.blur();
-    setTimeout(()=> showScreen(customizeScreen), 300);
+    afterKeyboardCloses(()=> showScreen(customizeScreen));
   });
   reasonInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') reasonNextBtn.click(); });
   reasonBackBtn.addEventListener('click', ()=> showScreen(startScreen));
@@ -1483,6 +1507,27 @@
       if(timeLeft <= 0){ endGame(false); }
     }, 1000);
   }
+
+  // BUGFIX: BGM/타이머가 다른 앱으로 나가도 계속 돌아가던 문제 —
+  // 화면(탭)이 안 보이게 되면 일시정지하고, 돌아오면 이어서 재개한다.
+  let wasRunningBeforeHidden = false;
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden){
+      if(running){
+        wasRunningBeforeHidden = true;
+        clearInterval(timerId);
+        stopBGM();
+        if(audioCtx) audioCtx.suspend();
+      }
+    } else {
+      if(wasRunningBeforeHidden && running){
+        wasRunningBeforeHidden = false;
+        if(audioCtx) audioCtx.resume();
+        startTimer();
+        startBGM();
+      }
+    }
+  });
 
   function screenFlash(strength){
     flashEl.style.transition = 'none';
