@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff2f6e">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>오늘 어떤 새끼 때문에 빡쳤나요?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1725,6 +1727,12 @@
 
   applyI18n();
 })();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
