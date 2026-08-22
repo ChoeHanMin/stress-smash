@@ -839,7 +839,14 @@
     window.scrollTo(0,0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    if(el) el.scrollTop = 0;
+    if(el){
+      el.scrollTop = 0;
+      // pin the screen's height to the real, current visual viewport —
+      // a defensive measure against any stale/mismatched viewport size
+      // left over from a mobile keyboard opening/closing.
+      const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      el.style.height = vh + 'px';
+    }
   }
   function showScreen(el){
     // BUGFIX: blur any focused input and reset scroll position before switching —
@@ -847,6 +854,10 @@
     if(document.activeElement && typeof document.activeElement.blur === 'function'){
       document.activeElement.blur();
     }
+    // safety net: clear any leftover shake transform on <body> so position:fixed
+    // screens can't end up anchored to a transformed containing block
+    document.body.classList.remove('screenshake');
+    document.body.style.transform = '';
     ALL_SCREENS.forEach(s => s.classList.remove('active'));
     el.classList.add('active');
     resetScrollPosition(el);
@@ -859,6 +870,17 @@
     const activeScreen = ALL_SCREENS.find(s => s.classList.contains('active'));
     resetScrollPosition(activeScreen);
   });
+  // BUGFIX: mobile keyboard show/hide fires visualViewport resize/scroll events
+  // that a plain window 'resize' listener can miss — this is the more reliable
+  // signal for "keyboard just closed, viewport just changed" on phones.
+  if(window.visualViewport){
+    const onViewportChange = ()=>{
+      const activeScreen = ALL_SCREENS.find(s => s.classList.contains('active'));
+      resetScrollPosition(activeScreen);
+    };
+    window.visualViewport.addEventListener('resize', onViewportChange);
+    window.visualViewport.addEventListener('scroll', onViewportChange);
+  }
 
   nextBtn.addEventListener('click', ()=>{
     const val = nameInput.value.trim();
