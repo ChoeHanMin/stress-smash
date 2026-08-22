@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>오늘 어떤 새끼 때문에 빡쳤나요?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hotpink:#ff2f6e;
+    --yellow:#ffd400;
+    --ink:#151316;
+    --cream:#fff6e8;
+    --sky:#3ec6ff;
+    --green:#3ddc84;
+    --purple:#8b5cf6;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
+  html{ color-scheme: light; }
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--cream);
+    font-family:'Jua',sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  body{
+    overflow-x:hidden;
+    background-image: radial-gradient(circle, rgba(21,19,22,0.08) 1.6px, transparent 1.6px);
+    background-size: 16px 16px;
+  }
+  #flash{
+    position:fixed; inset:0; background:#fff; opacity:0;
+    pointer-events:none; z-index:999; mix-blend-mode:screen;
+  }
+  .screen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px; text-align:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+    overflow-y:auto;
+  }
+  .screen.active{ opacity:1; pointer-events:auto; }
+
+  /* ---------- START SCREEN ---------- */
+  #start{ justify-content:center; position:relative; }
+  .topbar{
+    position:absolute; top:14px; left:14px; right:14px;
+    display:flex; justify-content:space-between; z-index:5;
+  }
+  .pillBtn{
+    font-family:'Jua',sans-serif; font-size:12px; color:var(--ink);
+    background:#fff; border:3px solid var(--ink); border-radius:999px;
+    padding:6px 14px; cursor:pointer; box-shadow:3px 3px 0 var(--ink);
+  }
+  .pillBtn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+
+  #start .badge, #reason .badge{
+    background:var(--yellow); border:5px solid var(--ink); border-radius:999px;
+    padding:6px 22px; font-size:14px; transform:rotate(-4deg);
+    box-shadow:5px 5px 0 var(--ink); margin-bottom:18px;
+  }
+  #start h1, #reason h1{
+    font-family:'Jua',sans-serif;
+    font-weight:400;
+    font-size:clamp(24px,6.2vw,36px);
+    line-height:1.55;
+    letter-spacing:0.3px;
+    margin:0 0 24px;
+    color:var(--ink);
+    word-break:keep-all;
+  }
+  #nameInput, #reasonInput{
+    font-family:'Jua',sans-serif; font-size:20px; text-align:center;
+    padding:14px 18px; width:min(320px,80vw);
+    border:5px solid var(--ink); border-radius:14px; outline:none;
+    background:#fff; box-shadow:4px 4px 0 var(--ink); margin-bottom:16px;
+  }
+  #nameInput:focus, #reasonInput:focus{ border-color:var(--hotpink); }
+  #nameInput.shake-input{ animation: shakeit .3s; border-color:var(--hotpink); }
+  .bigbtn{
+    font-family:'Jua',sans-serif; font-size:22px; color:#fff;
+    background:var(--hotpink); border:5px solid var(--ink); border-radius:16px;
+    padding:14px 38px; cursor:pointer; box-shadow:6px 6px 0 var(--ink);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .bigbtn:active{ transform:translate(4px,4px); box-shadow:2px 2px 0 var(--ink); }
+  #start .sub, #reason .sub{ margin-top:12px; font-size:13px; color:#555; max-width:320px; word-break:keep-all; }
+
+  /* ---------- REASON SCREEN ---------- */
+  #reason{ justify-content:center; position:relative; }
+
+  /* ---------- CUSTOMIZE SCREEN ---------- */
+  #customize{ justify-content:flex-start; padding-top:26px; position:relative; }
+  .backBtn{
+    position:absolute; top:14px; left:14px;
+    font-family:'Jua',sans-serif; font-size:13px; color:var(--ink);
+    background:#fff; border:3px solid var(--ink); border-radius:999px;
+    padding:6px 16px; cursor:pointer; box-shadow:3px 3px 0 var(--ink); z-index:5;
+  }
+  .customize-box{
+    width:min(380px,90vw);
+    background:#fff; border:5px solid var(--ink); border-radius:18px;
+    box-shadow:5px 5px 0 var(--ink);
+    padding:16px 18px 22px; margin:36px 0 18px;
+  }
+  .customize-title{
+    font-family:'Jua',sans-serif; font-size:15px;
+    background:var(--sky); display:inline-block; padding:3px 14px;
+    border:3px solid var(--ink); border-radius:8px; transform:rotate(-2deg);
+    margin-bottom:12px;
+  }
+  .preview-wrap{
+    width:170px; height:190px; margin:0 auto 16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .section-divider{
+    font-size:12px; color:#999; text-align:left; margin:14px 0 4px;
+    border-top:2px dashed #ddd; padding-top:10px;
+  }
+  .cust-row{ text-align:left; margin:10px 0; }
+  .cust-label{ font-size:13px; color:#444; margin-bottom:5px; display:flex; justify-content:space-between; }
+  .cust-label span.tag{ color:#999; font-size:11px; }
+  .swatches{ display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch{
+    width:28px; height:28px; border-radius:50%;
+    border:3px solid var(--ink); cursor:pointer;
+    transition:transform .1s ease;
+  }
+  .swatch.selected{ transform:scale(1.18); box-shadow:0 0 0 2px var(--ink); }
+  input[type="range"]{ width:100%; accent-color:var(--hotpink); }
+
+  .genderRow{ display:flex; gap:8px; }
+  .genderBtn{
+    flex:1; font-family:'Jua',sans-serif; font-size:13px;
+    padding:9px 6px; border:3px solid var(--ink); border-radius:10px;
+    background:#fff; cursor:pointer;
+  }
+  .genderBtn.selected{ background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+
+  /* ---------- GAME SCREEN ---------- */
+  #game{ justify-content:flex-start; padding-top:14px; }
+  .hud{ width:100%; max-width:420px; display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  .hud-row{ display:flex; justify-content:space-between; align-items:center; }
+  #timeLeft{
+    font-family:'Jua',sans-serif; background:var(--ink); color:var(--yellow);
+    padding:4px 14px; border-radius:10px; font-size:20px;
+  }
+  #comboLabel{
+    font-family:'Jua',sans-serif; font-size:18px; color:var(--hotpink);
+    opacity:0; transform:scale(0.6); transition:opacity .1s, transform .1s;
+  }
+  #comboLabel.show{ opacity:1; transform:scale(1); }
+  .gauge-wrap{ width:100%; text-align:left; }
+  .gauge-label{ font-size:13px; margin-bottom:3px; color:#444; }
+  .gauge-track{
+    width:100%; height:26px; background:#fff; border:4px solid var(--ink);
+    border-radius:14px; overflow:hidden; position:relative;
+  }
+  .gauge-fill{
+    height:100%; background:linear-gradient(90deg, var(--hotpink), #ff7a3d);
+    width:100%; transition:width .12s ease;
+  }
+  #targetName{
+    font-family:'Jua',sans-serif; font-size:clamp(19px,5.6vw,28px);
+    background:#fff; border:4px solid var(--ink); border-radius:12px;
+    padding:4px 20px; margin:6px 0 2px; box-shadow:4px 4px 0 var(--ink);
+    transform:rotate(-2deg); position:relative; z-index:2; word-break:keep-all;
+  }
+
+  .weaponBar{
+    display:flex; gap:8px; overflow-x:auto; width:min(340px,84vw);
+    padding:8px 4px; margin-top:10px; -webkit-overflow-scrolling:touch;
+  }
+  .weaponBar::-webkit-scrollbar{ height:4px; }
+  .weaponBtn{
+    flex:0 0 auto; width:38px; height:38px; font-size:19px;
+    border:3px solid var(--ink); border-radius:10px; background:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .weaponBtn.selected{ background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+
+  .arena{
+    position:relative; width:min(320px,78vw); height:min(340px,80vw);
+    margin-top:14px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .dummy{ width:74%; height:82%; position:relative; transform-origin:center bottom; }
+  .rope{ position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:6px; height:42px; background:var(--ink); }
+
+  .torso{
+    position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+    height:100%; overflow:visible;
+    border:6px solid var(--ink);
+    border-radius:44% 44% 52% 52% / 58% 58% 42% 42%;
+    box-shadow: inset -12px -14px 0 rgba(0,0,0,0.08);
+    transition:border-radius .15s ease, filter .2s ease;
+  }
+  .shoulder{
+    position:absolute; top:16%; border-radius:50%;
+    border:6px solid var(--ink);
+    z-index:0;
+  }
+  .shoulder.left{ left:-2%; }
+  .shoulder.right{ right:-2%; }
+
+  .hairCap{
+    position:absolute; top:-4%; left:50%; transform:translateX(-50%);
+    width:66%; height:13%;
+    border-radius:50% 50% 8% 8% / 75% 75% 8% 8%;
+    border:5px solid var(--ink); border-bottom:none;
+    z-index:1; transition:opacity .15s ease;
+  }
+  .hairSide{
+    position:absolute; top:0%; width:13%;
+    border-radius:0 0 50% 50%;
+    border:5px solid var(--ink); border-top:none;
+    z-index:1; transition:height .15s ease, opacity .15s ease;
+  }
+  .hairSide.left{ left:1%; }
+  .hairSide.right{ right:1%; }
+
+  .face{
+    position:absolute; top:32%; left:50%; transform:translate(-50%,-50%);
+    display:flex; gap:10%; width:60%; justify-content:center; z-index:3;
+  }
+  .brow{
+    position:absolute; width:15%; height:4px; background:var(--ink);
+    top:16%; border-radius:3px; transition:transform .15s ease; z-index:3;
+  }
+  .brow.left{ left:20%; transform:rotate(8deg); }
+  .brow.right{ right:20%; transform:rotate(-8deg); }
+  .eye{
+    aspect-ratio:1/1; border-radius:50%; position:relative;
+    background:#fff; border:3px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    transition:height .15s ease;
+  }
+  .pupil{ width:58%; aspect-ratio:1/1; border-radius:50%; }
+  .nose{
+    position:absolute; top:44%; left:50%; transform:translate(-50%,-50%);
+    border-radius:50%; background:rgba(0,0,0,0.12); border:2px solid rgba(0,0,0,0.3);
+    z-index:2;
+  }
+  .mouth{
+    position:absolute; top:52%; left:50%; transform:translate(-50%,0);
+    border:6px solid var(--ink); border-top:none;
+    border-radius:0 0 40px 40px; z-index:3;
+    transition:border-radius .15s ease, width .15s ease, height .15s ease,
+               border-color .15s ease, border-width .15s ease, top .15s ease;
+  }
+  .dizzy .eye{ visibility:hidden; }
+  .dizzy .face::before, .dizzy .face::after{
+    content:"✕"; font-family:sans-serif; font-weight:900; font-size:22px; color:var(--ink); line-height:1;
+  }
+
+  .expr-1 .brow.left{ transform:rotate(16deg); }
+  .expr-1 .brow.right{ transform:rotate(-16deg); }
+  .expr-1 .eye{ height:80%; }
+
+  .expr-2 .brow.left{ transform:rotate(24deg) translateY(2px); }
+  .expr-2 .brow.right{ transform:rotate(-24deg) translateY(2px); }
+  .expr-2 .eye{ height:65%; }
+  .expr-2 .mouth{ border-radius:40px 40px 0 0; border-top:6px solid var(--ink); border-bottom:none; }
+
+  .expr-3 .brow.left{ transform:rotate(32deg) translateY(4px); }
+  .expr-3 .brow.right{ transform:rotate(-32deg) translateY(4px); }
+  .expr-3 .eye{ height:55%; }
+  .expr-3 .mouth{ border-radius:50%; border:6px solid var(--ink); width:26%; height:22%; top:56%; }
+
+  .torso.reaction-gross{ filter:hue-rotate(70deg) saturate(1.3); }
+  .torso.reaction-wet{ filter:brightness(0.96) saturate(1.15); }
+
+  /* crying + huffing reactions as stress drops */
+  .tear{
+    position:absolute; width:7%; aspect-ratio:1/1.4;
+    background:#3ec6ff; border:2px solid var(--ink);
+    border-radius:50% 50% 50% 0; transform:rotate(45deg);
+    opacity:0; z-index:4;
+  }
+  .tear.left{ top:44%; left:29%; }
+  .tear.right{ top:44%; right:29%; }
+  .expr-2 .tear, .expr-3 .tear{ animation: tearDrip 1s ease-in infinite; }
+  .expr-2 .tear.right, .expr-3 .tear.right{ animation-delay:.4s; }
+  @keyframes tearDrip{
+    0%{ transform:translateY(0) rotate(45deg) scale(1); opacity:0.9; }
+    75%{ transform:translateY(16px) rotate(45deg) scale(0.85); opacity:0.5; }
+    100%{ transform:translateY(20px) rotate(45deg) scale(0.6); opacity:0; }
+  }
+
+  .huff{
+    position:absolute; width:9%; aspect-ratio:1/1;
+    background:rgba(255,255,255,0.9); border:2px solid var(--ink);
+    border-radius:50%; opacity:0; z-index:3;
+  }
+  .huff.left{ top:48%; left:10%; }
+  .huff.right{ top:48%; right:10%; }
+  .expr-1 .huff.left, .expr-2 .huff.left, .expr-3 .huff.left{ animation: huffLeft .55s ease-out infinite; }
+  .expr-1 .huff.right, .expr-2 .huff.right, .expr-3 .huff.right{ animation: huffRight .55s ease-out infinite; }
+  @keyframes huffLeft{
+    0%{ transform:translateX(0) scale(0.4); opacity:0.85; }
+    100%{ transform:translateX(-13px) scale(1.25); opacity:0; }
+  }
+  @keyframes huffRight{
+    0%{ transform:translateX(0) scale(0.4); opacity:0.85; }
+    100%{ transform:translateX(13px) scale(1.25); opacity:0; }
+  }
+
+  .patch{
+    position:absolute; opacity:0; z-index:4; transition:opacity .2s ease;
+    font-size:26px; filter:drop-shadow(1px 2px 0 rgba(0,0,0,0.25));
+  }
+  .patch1{ top:6%; left:2%;  transform:rotate(-18deg); }
+  .patch2{ bottom:12%; right:0%; transform:rotate(14deg); }
+  .patch3{ top:2%; right:6%; transform:rotate(8deg); }
+  .patch4{ bottom:4%; left:8%; transform:rotate(-8deg); }
+  .patch5{ top:34%; left:-10%; transform:rotate(-4deg); }
+
+  .bruise{
+    position:absolute; border-radius:50%; pointer-events:none; z-index:2;
+    background:radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.35) 45%, rgba(139,92,246,0) 75%);
+    mix-blend-mode:multiply;
+    transform:translate(-50%,-50%) scale(0.3);
+    opacity:0;
+    transition:opacity .25s ease, transform .25s cubic-bezier(.3,1.6,.4,1);
+  }
+
+  .orbit{
+    position:absolute; top:2%; left:50%; width:1px; height:1px; opacity:0; z-index:5;
+    transition:opacity .2s ease;
+  }
+  .orbit span{ position:absolute; font-size:20px; animation: spin 1.1s linear infinite; transform-origin:0 0; }
+  .orbit span:nth-child(1){ animation-delay:0s; }
+  .orbit span:nth-child(2){ animation-delay:.28s; }
+  .orbit span:nth-child(3){ animation-delay:.56s; }
+  .orbit span:nth-child(4){ animation-delay:.84s; }
+  @keyframes spin{
+    from{ transform: rotate(0deg) translateX(34px) rotate(0deg); }
+    to{ transform: rotate(360deg) translateX(34px) rotate(-360deg); }
+  }
+
+  .weapon-fx{ position:absolute; font-size:46px; pointer-events:none; z-index:6; }
+  .burst{
+    position:absolute; font-family:'Jua',sans-serif; font-size:0px;
+    color:var(--hotpink); -webkit-text-stroke: 2px var(--ink); pointer-events:none;
+    z-index:7; white-space:nowrap;
+  }
+  .debris{ position:absolute; font-size:20px; pointer-events:none; z-index:5; will-change:transform, opacity; }
+  .reactIcon{
+    position:absolute; font-size:30px; pointer-events:none; z-index:9;
+    transform:translate(-50%,-50%) scale(0.2); opacity:0;
+    transition:transform .25s cubic-bezier(.3,1.7,.4,1), opacity .25s ease;
+  }
+  .milestone{
+    position:absolute; top:36%; left:50%; transform:translate(-50%,-50%) scale(0.3) rotate(-8deg);
+    font-family:'Jua',sans-serif; font-size:26px; color:var(--yellow);
+    -webkit-text-stroke:3px var(--ink); opacity:0; pointer-events:none; z-index:8; white-space:nowrap;
+  }
+
+  .signPost{
+    position:absolute; left:-4%; bottom:2%; display:flex; flex-direction:column; align-items:center;
+    z-index:4; pointer-events:none;
+  }
+  .signBoard{
+    background:#fff8e7; border:4px solid var(--ink); border-radius:8px;
+    padding:6px 9px; font-size:10.5px; line-height:1.35; max-width:98px;
+    text-align:center; word-break:keep-all; box-shadow:3px 3px 0 var(--ink);
+    transform:rotate(-6deg); font-family:'Jua',sans-serif;
+  }
+  .signStick{ width:6px; height:40px; background:#a9743f; border:2px solid var(--ink); margin-top:-3px; }
+
+  .shake{ animation: shakeit .28s; }
+  @keyframes shakeit{
+    0%{ transform:translate(0,0) rotate(0); } 20%{ transform:translate(-8px,4px) rotate(-3deg); }
+    40%{ transform:translate(7px,-5px) rotate(3deg); } 60%{ transform:translate(-6px,3px) rotate(-2deg); }
+    80%{ transform:translate(5px,-3px) rotate(2deg); } 100%{ transform:translate(0,0) rotate(0); }
+  }
+  .shake-hard{ animation: shakeit-hard .4s; }
+  @keyframes shakeit-hard{
+    0%{ transform:translate(0,0) rotate(0); } 15%{ transform:translate(-14px,8px) rotate(-6deg); }
+    30%{ transform:translate(12px,-9px) rotate(6deg); } 45%{ transform:translate(-11px,6px) rotate(-5deg); }
+    60%{ transform:translate(10px,-6px) rotate(4deg); } 75%{ transform:translate(-7px,4px) rotate(-3deg); }
+    100%{ transform:translate(0,0) rotate(0); }
+  }
+  .flyback{ animation: flyback .35s ease-out; }
+  @keyframes flyback{
+    0%{ transform: rotate(0) translate(0,0) scale(1); } 30%{ transform: rotate(-16deg) translate(-22px,-10px) scale(0.94); }
+    60%{ transform: rotate(12deg) translate(16px,-4px) scale(1.02); } 100%{ transform: rotate(0) translate(0,0) scale(1); }
+  }
+  .squash{ animation: squash .22s ease-out; }
+  @keyframes squash{
+    0%{ transform:scaleY(1) scaleX(1); } 40%{ transform:scaleY(0.72) scaleX(1.18) translateY(6%); }
+    100%{ transform:scaleY(1) scaleX(1); }
+  }
+  .gust{ animation: gustsway .5s ease-out; }
+  @keyframes gustsway{
+    0%{ transform: rotate(0) translateX(0); } 30%{ transform: rotate(-10deg) translateX(-14px); }
+    70%{ transform: rotate(4deg) translateX(6px); } 100%{ transform: rotate(0) translateX(0); }
+  }
+  body.screenshake{ animation: bodyshake .3s; }
+  @keyframes bodyshake{
+    0%{ transform:translate(0,0); } 25%{ transform:translate(-6px,3px); }
+    50%{ transform:translate(6px,-4px); } 75%{ transform:translate(-4px,2px); } 100%{ transform:translate(0,0); }
+  }
+
+  #tapHint{ margin-top:14px; font-size:13px; color:#666; word-break:keep-all; }
+
+  #finishOverlay{
+    position:fixed; inset:0; z-index:900; display:flex; align-items:center; justify-content:center;
+    background:rgba(21,19,22,0); pointer-events:none; opacity:0;
+  }
+  #finishOverlay.show{ background:rgba(21,19,22,0.15); opacity:1; transition:opacity .1s; }
+  #finishText{
+    font-family:'Jua',sans-serif; font-size:clamp(30px,10vw,52px);
+    color:var(--hotpink); -webkit-text-stroke:4px var(--ink); transform:scale(0) rotate(-10deg);
+  }
+  #finishOverlay.show #finishText{ animation: finishPop .55s cubic-bezier(.2,1.6,.4,1) forwards; }
+  @keyframes finishPop{
+    0%{ transform:scale(0) rotate(-10deg); } 60%{ transform:scale(1.25) rotate(4deg); } 100%{ transform:scale(1) rotate(0deg); }
+  }
+
+  .modalOverlay{
+    position:fixed; inset:0; z-index:950; display:flex; align-items:center; justify-content:center;
+    background:rgba(21,19,22,0); pointer-events:none; opacity:0; transition:opacity .2s ease; padding:24px;
+  }
+  .modalOverlay.show{ background:rgba(21,19,22,0.45); opacity:1; pointer-events:auto; }
+  .modalCard{
+    background:#fff; border:5px solid var(--ink); border-radius:18px;
+    box-shadow:6px 6px 0 var(--ink); padding:26px 24px; max-width:320px; width:100%;
+    text-align:center; transform:scale(0.85); transition:transform .2s ease;
+  }
+  .modalOverlay.show .modalCard{ transform:scale(1); }
+  .modalCard h3{ font-family:'Jua',sans-serif; font-size:18px; margin:0 0 10px; }
+  .modalCard p{ font-size:14px; color:#444; line-height:1.6; margin:0 0 18px; word-break:keep-all; }
+  .modalClose{
+    font-family:'Jua',sans-serif; font-size:15px; color:#fff; background:var(--ink);
+    border:none; border-radius:10px; padding:9px 22px; cursor:pointer;
+  }
+
+  #result h2{ font-family:'Jua',sans-serif; font-size:clamp(22px,5.6vw,28px); margin-bottom:4px; word-break:keep-all; }
+  .resultCard{
+    background:#fff; border:5px solid var(--ink); border-radius:18px; box-shadow:6px 6px 0 var(--ink);
+    padding:26px 30px; margin:16px 0 20px; max-width:340px; width:88vw;
+  }
+  .resultRow{ display:flex; justify-content:space-between; font-size:18px; margin:8px 0; font-family:'Jua',sans-serif; }
+  .resultRow b{ font-family:'Jua',sans-serif; }
+  .stress-down{ color:var(--hotpink); } .calm-up{ color:#1fa463; } .combo-max{ color:#2b7fd1; }
+  #resultTitle{ font-size:15px; color:#777; margin-bottom:2px; word-break:keep-all; }
+
+  @media (prefers-reduced-motion: reduce){
+    .shake, .shake-hard, .flyback, .squash, .gust, body.screenshake, .orbit span{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="flash"></div>
+
+<!-- START -->
+<div id="start" class="screen active">
+  <div class="topbar">
+    <button class="pillBtn" id="devBtn" data-i18n="devBtn">개발자</button>
+    <button class="pillBtn" id="langBtn">English</button>
+  </div>
+  <div class="badge" data-i18n="badge">STRESS SMASH</div>
+  <h1><span data-i18n="titleLine1">오늘</span><br><span data-i18n="titleLine2">어떤 새끼 때문에</span><br><span data-i18n="titleLine3">빡쳤나요?</span></h1>
+  <input id="nameInput" type="text" maxlength="12" data-i18n-placeholder="namePlaceholder" placeholder="이름(or 별명)을 적어주세요">
+  <button class="bigbtn" id="nextBtn" data-i18n="nextBtn">다음 →</button>
+</div>
+
+<!-- REASON -->
+<div id="reason" class="screen">
+  <button class="backBtn" id="reasonBackBtn" data-i18n="backBtn">← 뒤로</button>
+  <div class="badge" data-i18n="reasonBadge">WANTED</div>
+  <h1 data-i18n-html="reasonTitle">이 새끼가<br>맞아야 하는 이유</h1>
+  <input id="reasonInput" type="text" maxlength="40" data-i18n-placeholder="reasonPlaceholder" placeholder="예: 단톡방에서 읽씹함">
+  <button class="bigbtn" id="reasonNextBtn" data-i18n="nextBtn">다음 →</button>
+  <p class="sub" data-i18n="reasonSub">※ 안 적어도 괜찮아요. 그냥 패면 됩니다.</p>
+</div>
+
+<!-- CUSTOMIZE -->
+<div id="customize" class="screen">
+  <button class="backBtn" id="backBtn" data-i18n="backBtn">← 뒤로</button>
+  <div class="customize-box">
+    <div class="customize-title" data-i18n="customizeTitle">샌드백 커스터마이징</div>
+    <div class="preview-wrap">
+      <div class="dummy" id="previewDummy" style="width:130px;height:170px;">
+        <div class="torso" id="pv_torso">
+          <div class="shoulder left" id="pv_shL"></div>
+          <div class="shoulder right" id="pv_shR"></div>
+          <div class="hairCap" id="pv_hairCap"></div>
+          <div class="hairSide left" id="pv_hairL"></div>
+          <div class="hairSide right" id="pv_hairR"></div>
+          <div class="face">
+            <div class="brow left"></div><div class="brow right"></div>
+            <div class="eye" id="pv_eyeL"><div class="pupil" id="pv_pupil1"></div></div>
+            <div class="eye" id="pv_eyeR"><div class="pupil" id="pv_pupil2"></div></div>
+          </div>
+          <div class="nose" id="pv_nose"></div>
+          <div class="mouth" id="pv_mouth"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="genderLabel">성별</span>
+      <div class="genderRow" id="genderRow">
+        <button class="genderBtn selected" data-value="neutral" data-i18n="genderNeutral">중성</button>
+        <button class="genderBtn" data-value="male" data-i18n="genderMale">남성</button>
+        <button class="genderBtn" data-value="female" data-i18n="genderFemale">여성</button>
+      </div>
+    </div>
+
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="skinLabel">피부색</span>
+      <div class="swatches" data-target="skin">
+        <div class="swatch selected" style="background:#ffd400" data-value="#ffd400"></div>
+        <div class="swatch" style="background:#ffb877" data-value="#ffb877"></div>
+        <div class="swatch" style="background:#e8967a" data-value="#e8967a"></div>
+        <div class="swatch" style="background:#a9dfff" data-value="#a9dfff"></div>
+        <div class="swatch" style="background:#c9f7c1" data-value="#c9f7c1"></div>
+        <div class="swatch" style="background:#d6b8ff" data-value="#d6b8ff"></div>
+      </div>
+    </div>
+
+    <div class="section-divider" data-i18n="sectionFace">얼굴</div>
+
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="hairColorLabel">머리색</span>
+      <div class="swatches" data-target="hair">
+        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+        <div class="swatch" style="background:#6b3f1d" data-value="#6b3f1d"></div>
+        <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
+        <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
+        <div class="swatch" style="background:#f4f4f4" data-value="#f4f4f4"></div>
+        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+      </div>
+    </div>
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="hairLengthLabel">머리 길이</span>
+      <input type="range" id="hairLength" min="0" max="100" value="35">
+    </div>
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="eyeColorLabel">눈동자색</span>
+      <div class="swatches" data-target="eye">
+        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+        <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
+        <div class="swatch" style="background:#3ddc84" data-value="#3ddc84"></div>
+        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+        <div class="swatch" style="background:#a0603a" data-value="#a0603a"></div>
+      </div>
+    </div>
+    <div class="cust-row">
+      <span class="cust-label"><span data-i18n="eyeSizeLabel">눈 크기</span> <span class="tag" data-i18n="eyeSizeTag">작게 ↔ 크게</span></span>
+      <input type="range" id="eyeSize" min="60" max="150" value="100">
+    </div>
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="noseSizeLabel">코 크기</span>
+      <input type="range" id="noseSize" min="40" max="160" value="90">
+    </div>
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="lipColorLabel">입술색</span>
+      <div class="swatches" data-target="lip">
+        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+        <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
+        <div class="swatch" style="background:#c0392b" data-value="#c0392b"></div>
+        <div class="swatch" style="background:#e67e22" data-value="#e67e22"></div>
+        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+      </div>
+    </div>
+    <div class="cust-row">
+      <span class="cust-label" data-i18n="lipSizeLabel">입술 크기</span>
+      <input type="range" id="lipSize" min="60" max="160" value="100">
+    </div>
+
+    <div class="section-divider" data-i18n="sectionBody">체형</div>
+
+    <div class="cust-row">
+      <span class="cust-label"><span data-i18n="bodyWidthLabel">체형</span> <span class="tag" data-i18n="bodyWidthTag">날씬 ↔ 통통</span></span>
+      <input type="range" id="bodyWidth" min="55" max="100" value="82">
+    </div>
+    <div class="cust-row">
+      <span class="cust-label"><span data-i18n="muscleLabel">근육량</span> <span class="tag" data-i18n="muscleTag">보통 ↔ 우락부락</span></span>
+      <input type="range" id="muscle" min="0" max="100" value="35">
+    </div>
+  </div>
+
+  <button class="bigbtn" id="beginBtn" data-i18n="startBtn">패러 가기 →</button>
+  <p class="sub" data-i18n="startSub">※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다 😌</p>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="hud">
+    <div class="hud-row">
+      <span id="timeLeft">30</span>
+      <button class="pillBtn" id="bgmToggle" style="font-size:16px; padding:2px 10px;">🔊</button>
+      <span id="comboLabel">COMBO 0</span>
+    </div>
+    <div class="gauge-wrap">
+      <div class="gauge-label" data-i18n="stressLabel">스트레스</div>
+      <div class="gauge-track"><div class="gauge-fill" id="gaugeFill"></div></div>
+    </div>
+  </div>
+
+  <div id="targetName">이름</div>
+
+  <div class="weaponBar" id="weaponBar"></div>
+
+  <div class="arena" id="arena">
+    <div class="rope"></div>
+    <div class="dummy" id="dummy">
+      <div class="torso" id="gm_torso">
+        <div class="shoulder left" id="gm_shL"></div>
+        <div class="shoulder right" id="gm_shR"></div>
+        <div class="hairCap" id="gm_hairCap"></div>
+        <div class="hairSide left" id="gm_hairL"></div>
+        <div class="hairSide right" id="gm_hairR"></div>
+        <div class="face" id="face">
+          <div class="brow left"></div><div class="brow right"></div>
+          <div class="eye" id="gm_eyeL"><div class="pupil" id="gm_pupil1"></div></div>
+          <div class="eye" id="gm_eyeR"><div class="pupil" id="gm_pupil2"></div></div>
+          <div class="tear left"></div><div class="tear right"></div>
+        </div>
+        <div class="nose" id="gm_nose"></div>
+        <div class="mouth" id="gm_mouth"></div>
+        <div class="huff left"></div><div class="huff right"></div>
+        <div class="orbit" id="orbit">
+          <span>⭐</span><span>💫</span><span>⭐</span><span>💫</span>
+        </div>
+        <div class="patch patch1">🩹</div>
+        <div class="patch patch2">🩹</div>
+        <div class="patch patch3">🧊</div>
+        <div class="patch patch4">🦴</div>
+        <div class="patch patch5">🩼</div>
+      </div>
+    </div>
+    <div class="signPost" id="signPost">
+      <div class="signBoard" id="signBoard"></div>
+      <div class="signStick"></div>
+    </div>
+  </div>
+  <p id="tapHint" data-i18n="tapHint">화면을 마구 두드려서 스트레스를 날려버리세요!</p>
+</div>
+
+<div id="finishOverlay"><div id="finishText"></div></div>
+
+<div class="modalOverlay" id="devModal">
+  <div class="modalCard">
+    <h3 data-i18n="devModalTitle">개발자 정보</h3>
+    <p data-i18n-html="devModalText">제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요 👊</p>
+    <button class="modalClose" id="devModalClose" data-i18n="devModalClose">닫기</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="badge" data-i18n="resultBadge">RESULT</div>
+  <p id="resultTitle"></p>
+  <h2 id="resultHeadline"></h2>
+  <div class="resultCard">
+    <div class="resultRow"><span data-i18n="stressLabel">스트레스</span><b class="stress-down" id="stressResult">-0</b></div>
+    <div class="resultRow"><span data-i18n="calmLabel">평정심</span><b class="calm-up" id="calmResult">+0</b></div>
+    <div class="resultRow"><span data-i18n="comboMaxLabel">최대 콤보</span><b class="combo-max" id="comboResult">0</b></div>
+    <div class="resultRow"><span data-i18n="weaponLabel">가장 많이 쓴 무기</span><b id="weaponResult">-</b></div>
+  </div>
+  <button class="bigbtn" id="retryBtn" data-i18n="retryBtn">한 판 더 패기</button>
+</div>
+
+<script>
+(function(){
+  /* ---------------- I18N ---------------- */
+  const STR = {
+    ko: {
+      badge:'STRESS SMASH',
+      titleLine1:'오늘', titleLine2:'어떤 새끼 때문에', titleLine3:'빡쳤나요?',
+      namePlaceholder:'이름(or 별명)을 적어주세요',
+      nextBtn:'다음 →',
+      devBtn:'개발자',
+      backBtn:'← 뒤로',
+      reasonBadge:'WANTED',
+      reasonTitle:'이 새끼가<br>맞아야 하는 이유',
+      reasonPlaceholder:'예: 단톡방에서 읽씹함',
+      reasonSub:'※ 안 적어도 괜찮아요. 그냥 패면 됩니다.',
+      reasonDefault:'그냥 좀 맞아야 할 것 같아서',
+      devModalTitle:'개발자 정보',
+      devModalText:'제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요 👊',
+      devModalClose:'닫기',
+      customizeTitle:'샌드백 커스터마이징',
+      genderLabel:'성별', genderNeutral:'중성', genderMale:'남성', genderFemale:'여성',
+      skinLabel:'피부색',
+      sectionFace:'얼굴',
+      hairColorLabel:'머리색', hairLengthLabel:'머리 길이',
+      eyeColorLabel:'눈동자색', eyeSizeLabel:'눈 크기', eyeSizeTag:'작게 ↔ 크게',
+      noseSizeLabel:'코 크기',
+      lipColorLabel:'입술색', lipSizeLabel:'입술 크기',
+      sectionBody:'체형',
+      bodyWidthLabel:'체형', bodyWidthTag:'날씬 ↔ 통통',
+      muscleLabel:'근육량', muscleTag:'보통 ↔ 우락부락',
+      startBtn:'패러 가기 →',
+      startSub:'※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다 😌',
+      tapHint:'화면을 마구 두드려서 스트레스를 날려버리세요!',
+      resultBadge:'RESULT',
+      stressLabel:'스트레스', calmLabel:'평정심', comboMaxLabel:'최대 콤보', weaponLabel:'가장 많이 쓴 무기',
+      retryBtn:'한 판 더 패기',
+      resultTitleSuffix:' 처단 완료',
+      headlines:{ great:'완전 초토화 🔥', good:'속이 다 시원하다 😌', ok:'그래도 좀 풀렸다 🙂', low:'아직 덜 풀렸는데...? 😤' },
+      weapons:{
+        fist:'주먹', hammer:'뿅망치', cushion:'쿠션', papers:'서류뭉치', keyboard:'키보드', chicken:'고무닭',
+        slipper:'대왕 슬리퍼', pan:'프라이팬', books:'전공책 더미', broom:'빗자루', waterballoon:'물풍선',
+        confetti:'컨페티 캐논', extinguisher:'소화기', glove:'복싱글러브 발사기', fan:'부채',
+        fart:'방귀 폭탄', fish:'언 동태', sock:'냄새나는 양말', sax:'색소폰 (뿅!)', toiletpaper:'두루마리 휴지'
+      },
+      randomLabel:'랜덤',
+      burstLow:['퍽!','툭!','팡!','텅!'], burstMid:['빠악!','으적!','우당탕!','캬악!'], burstHigh:['박살!!','와지끈!!','뿌지직!!','뻐어어억!!'],
+      burstWet:['철퍽!','촤악!'], burstGross:['뿌우웅!','흐엑!'], burstMusical:['빠앙!','뚜루루!'],
+      burstParty:['짜잔!','와아!'], burstHiss:['치이익!'], burstGust:['휘이잉~'],
+      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','전설의 손맛 👑'],
+      yelps:{ male:['윽!','으악!','아야!'], female:['꺄악!','아앗!','악!'], neutral:['으악!','악!','윽!'] },
+      speechLang:'ko-KR', emptyNameFallback:'그 새끼'
+    },
+    en: {
+      badge:'STRESS SMASH',
+      titleLine1:'Who ruined', titleLine2:'your day', titleLine3:'today?',
+      namePlaceholder:'Enter a name (or nickname)',
+      nextBtn:'Next →',
+      devBtn:'Developer',
+      backBtn:'← Back',
+      reasonBadge:'WANTED',
+      reasonTitle:'Why does this<br>jerk deserve it?',
+      reasonPlaceholder:'e.g. left me on read',
+      reasonSub:"※ It's fine to leave this blank. Just start smashing.",
+      reasonDefault:'just felt like it',
+      devModalTitle:'About the developer',
+      devModalText:'Made by Choi Hanmin<br>A goofy little prototype for blowing off steam. Have fun smashing 👊',
+      devModalClose:'Close',
+      customizeTitle:'Customize your target',
+      genderLabel:'Gender', genderNeutral:'Neutral', genderMale:'Male', genderFemale:'Female',
+      skinLabel:'Skin tone',
+      sectionFace:'Face',
+      hairColorLabel:'Hair color', hairLengthLabel:'Hair length',
+      eyeColorLabel:'Eye color', eyeSizeLabel:'Eye size', eyeSizeTag:'Small ↔ Big',
+      noseSizeLabel:'Nose size',
+      lipColorLabel:'Lip color', lipSizeLabel:'Lip size',
+      sectionBody:'Body',
+      bodyWidthLabel:'Body type', bodyWidthTag:'Slim ↔ Wide',
+      muscleLabel:'Muscle mass', muscleTag:'Average ↔ Jacked',
+      startBtn:'Start smashing →',
+      startSub:'※ Instead of a real photo, a custom sandbag character takes the hits for you 😌',
+      tapHint:'Tap the screen like crazy and blast your stress away!',
+      resultBadge:'RESULT',
+      stressLabel:'Stress', calmLabel:'Calm', comboMaxLabel:'Best combo', weaponLabel:'Most-used weapon',
+      retryBtn:'Smash again',
+      resultTitleSuffix:' — case closed',
+      headlines:{ great:'Completely wrecked 🔥', good:'That felt so good 😌', ok:'A bit better now 🙂', low:'Still not over it...? 😤' },
+      weapons:{
+        fist:'Fist', hammer:'Squeaky hammer', cushion:'Cushion', papers:'Paper stack', keyboard:'Keyboard', chicken:'Rubber chicken',
+        slipper:'Giant slipper', pan:'Frying pan', books:'Textbook stack', broom:'Broom', waterballoon:'Water balloon',
+        confetti:'Confetti cannon', extinguisher:'Fire extinguisher', glove:'Boxing glove launcher', fan:'Fan',
+        fart:'Fart bomb', fish:'Frozen fish', sock:'Stinky sock', sax:'Honking saxophone', toiletpaper:'Toilet paper roll'
+      },
+      randomLabel:'Random',
+      burstLow:['POW!','BONK!','THWAP!','BAM!'], burstMid:['SMACK!','CRUNCH!','WHUMP!','YOWCH!'], burstHigh:['CRUSHED!!','SPLAT!!','DEMOLISHED!!','OBLITERATED!!'],
+      burstWet:['SPLASH!','SPLOOSH!'], burstGross:['PFFFT!','EWWW!'], burstMusical:['HONK!','TOOT!'],
+      burstParty:['TA-DA!','WOO!'], burstHiss:['PSHHH!'], burstGust:['WHOOSH!'],
+      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','Legendary hands 👑'],
+      yelps:{ male:['Ugh!','Ow!','Argh!'], female:['Eek!','Yikes!','Ow!'], neutral:['Ow!','Ugh!','Ouch!'] },
+      speechLang:'en-US', emptyNameFallback:'that jerk'
+    }
+  };
+  let currentLang = 'ko';
+  function t(key){ return STR[currentLang][key]; }
+
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(STR[currentLang][key] !== undefined) el.textContent = STR[currentLang][key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+      const key = el.getAttribute('data-i18n-html');
+      if(STR[currentLang][key] !== undefined) el.innerHTML = STR[currentLang][key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+      const key = el.getAttribute('data-i18n-placeholder');
+      if(STR[currentLang][key] !== undefined) el.placeholder = STR[currentLang][key];
+    });
+    langBtn.textContent = currentLang === 'ko' ? 'English' : '한국어';
+    renderWeaponBar();
+  }
+
+  const langBtn = document.getElementById('langBtn');
+  langBtn.addEventListener('click', ()=>{
+    currentLang = currentLang === 'ko' ? 'en' : 'ko';
+    applyI18n();
+  });
+
+  /* ---------------- SCREENS ---------------- */
+  const startScreen = document.getElementById('start');
+  const reasonScreen = document.getElementById('reason');
+  const customizeScreen = document.getElementById('customize');
+  const gameScreen = document.getElementById('game');
+  const resultScreen = document.getElementById('result');
+  const nameInput = document.getElementById('nameInput');
+  const reasonInput = document.getElementById('reasonInput');
+  const nextBtn = document.getElementById('nextBtn');
+  const reasonBackBtn = document.getElementById('reasonBackBtn');
+  const reasonNextBtn = document.getElementById('reasonNextBtn');
+  const backBtn = document.getElementById('backBtn');
+  const beginBtn = document.getElementById('beginBtn');
+  const retryBtn = document.getElementById('retryBtn');
+  const targetName = document.getElementById('targetName');
+  const arena = document.getElementById('arena');
+  const dummy = document.getElementById('dummy');
+  const gmTorso = document.getElementById('gm_torso');
+  const gaugeFill = document.getElementById('gaugeFill');
+  const timeLeftEl = document.getElementById('timeLeft');
+  const comboLabel = document.getElementById('comboLabel');
+  const patches = document.querySelectorAll('#gm_torso > .patch');
+  const orbit = document.getElementById('orbit');
+  const flashEl = document.getElementById('flash');
+  const finishOverlay = document.getElementById('finishOverlay');
+  const finishText = document.getElementById('finishText');
+  const devBtn = document.getElementById('devBtn');
+  const devModal = document.getElementById('devModal');
+  const devModalClose = document.getElementById('devModalClose');
+  const signBoard = document.getElementById('signBoard');
+  const weaponBar = document.getElementById('weaponBar');
+
+  let enteredName = '';
+  let enteredReason = '';
+
+  const ALL_SCREENS = [startScreen, reasonScreen, customizeScreen, gameScreen, resultScreen];
+  function resetScrollPosition(el){
+    window.scrollTo(0,0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if(el) el.scrollTop = 0;
+  }
+  function showScreen(el){
+    // BUGFIX: blur any focused input and reset scroll position before switching —
+    // otherwise a mobile keyboard closing mid-transition left a big blank gap.
+    if(document.activeElement && typeof document.activeElement.blur === 'function'){
+      document.activeElement.blur();
+    }
+    ALL_SCREENS.forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    resetScrollPosition(el);
+    // do it again after layout settles, in case the keyboard closing animation
+    // was still resizing the viewport at the moment we switched screens
+    requestAnimationFrame(()=> resetScrollPosition(el));
+    setTimeout(()=> resetScrollPosition(el), 350);
+  }
+  window.addEventListener('resize', ()=>{
+    const activeScreen = ALL_SCREENS.find(s => s.classList.contains('active'));
+    resetScrollPosition(activeScreen);
+  });
+
+  nextBtn.addEventListener('click', ()=>{
+    const val = nameInput.value.trim();
+    if(!val){
+      nameInput.classList.remove('shake-input');
+      void nameInput.offsetWidth;
+      nameInput.classList.add('shake-input');
+      nameInput.focus();
+      return;
+    }
+    enteredName = val;
+    nameInput.blur();
+    setTimeout(()=> showScreen(reasonScreen), 300);
+  });
+  nameInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') nextBtn.click(); });
+
+  reasonNextBtn.addEventListener('click', ()=>{
+    enteredReason = reasonInput.value.trim();
+    reasonInput.blur();
+    setTimeout(()=> showScreen(customizeScreen), 300);
+  });
+  reasonInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') reasonNextBtn.click(); });
+  reasonBackBtn.addEventListener('click', ()=> showScreen(startScreen));
+  backBtn.addEventListener('click', ()=> showScreen(reasonScreen));
+
+  devBtn.addEventListener('click', ()=> devModal.classList.add('show'));
+  devModalClose.addEventListener('click', ()=> devModal.classList.remove('show'));
+  devModal.addEventListener('click', (e)=>{ if(e.target === devModal) devModal.classList.remove('show'); });
+
+  /* ---------------- CUSTOMIZATION ---------------- */
+  const look = {
+    gender:'neutral',
+    skin:'#ffd400', hair:'#151316', hairLength:35,
+    eye:'#151316', eyeSize:100, noseSize:90,
+    lip:'#151316', lipSize:100,
+    bodyWidth:82, muscle:35
+  };
+
+  const GENDER_PRESETS = {
+    neutral: { hairLength:35, muscle:35, bodyWidth:82 },
+    male:    { hairLength:12, muscle:65, bodyWidth:92 },
+    female:  { hairLength:70, muscle:18, bodyWidth:72 },
+  };
+
+  const els = {
+    pv: {
+      torso: document.getElementById('pv_torso'),
+      shL: document.getElementById('pv_shL'), shR: document.getElementById('pv_shR'),
+      hairCap: document.getElementById('pv_hairCap'),
+      hairL: document.getElementById('pv_hairL'), hairR: document.getElementById('pv_hairR'),
+      eyeL: document.getElementById('pv_eyeL'), eyeR: document.getElementById('pv_eyeR'),
+      pupil1: document.getElementById('pv_pupil1'), pupil2: document.getElementById('pv_pupil2'),
+      nose: document.getElementById('pv_nose'), mouth: document.getElementById('pv_mouth')
+    },
+    gm: {
+      torso: document.getElementById('gm_torso'),
+      shL: document.getElementById('gm_shL'), shR: document.getElementById('gm_shR'),
+      hairCap: document.getElementById('gm_hairCap'),
+      hairL: document.getElementById('gm_hairL'), hairR: document.getElementById('gm_hairR'),
+      eyeL: document.getElementById('gm_eyeL'), eyeR: document.getElementById('gm_eyeR'),
+      pupil1: document.getElementById('gm_pupil1'), pupil2: document.getElementById('gm_pupil2'),
+      nose: document.getElementById('gm_nose'), mouth: document.getElementById('gm_mouth')
+    }
+  };
+
+  function applyLook(){
+    [els.pv, els.gm].forEach(el=>{
+      el.torso.style.background = look.skin;
+      el.torso.style.width = look.bodyWidth + '%';
+
+      const shSize = Math.round(10 + look.muscle * 0.32) + '%';
+      [el.shL, el.shR].forEach(s=>{
+        s.style.width = shSize; s.style.height = shSize; s.style.background = look.skin;
+      });
+
+      const hasHair = look.hairLength > 2;
+      el.hairCap.style.background = look.hair;
+      el.hairCap.style.opacity = hasHair ? 1 : 0;
+      const sideH = hasHair ? Math.round(10 + look.hairLength * 0.55) + '%' : '0%';
+      [el.hairL, el.hairR].forEach(s=>{
+        s.style.background = look.hair;
+        s.style.height = sideH;
+        s.style.opacity = hasHair ? 1 : 0;
+      });
+
+      const eyeW = Math.round(16 * (look.eyeSize/100)) + '%';
+      el.eyeL.style.width = eyeW; el.eyeR.style.width = eyeW;
+      el.pupil1.style.background = look.eye; el.pupil2.style.background = look.eye;
+
+      const noseSizePx = Math.round(look.noseSize * 0.16);
+      el.nose.style.width = noseSizePx + 'px';
+      el.nose.style.height = Math.round(noseSizePx*0.8) + 'px';
+
+      const lipScale = look.lipSize/100;
+      el.mouth.style.width = Math.round(34 * lipScale) + '%';
+      el.mouth.style.height = Math.round(12 * lipScale) + '%';
+      el.mouth.style.borderColor = look.lip;
+      el.mouth.style.borderWidth = Math.round(4 + lipScale*3) + 'px';
+    });
+  }
+
+  document.querySelectorAll('.swatches').forEach(group=>{
+    const target = group.getAttribute('data-target');
+    group.querySelectorAll('.swatch').forEach(sw=>{
+      sw.addEventListener('click', ()=>{
+        group.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+        sw.classList.add('selected');
+        const val = sw.getAttribute('data-value');
+        if(target==='skin') look.skin = val;
+        if(target==='hair') look.hair = val;
+        if(target==='eye') look.eye = val;
+        if(target==='lip') look.lip = val;
+        applyLook();
+      });
+    });
+  });
+
+  const sliderEls = {};
+  function bindSlider(id, key){
+    const el = document.getElementById(id);
+    sliderEls[key] = el;
+    el.addEventListener('input', (e)=>{
+      look[key] = parseInt(e.target.value, 10);
+      applyLook();
+    });
+  }
+  bindSlider('hairLength','hairLength');
+  bindSlider('eyeSize','eyeSize');
+  bindSlider('noseSize','noseSize');
+  bindSlider('lipSize','lipSize');
+  bindSlider('bodyWidth','bodyWidth');
+  bindSlider('muscle','muscle');
+
+  document.querySelectorAll('.genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const g = btn.getAttribute('data-value');
+      look.gender = g;
+      const preset = GENDER_PRESETS[g];
+      look.hairLength = preset.hairLength; sliderEls.hairLength.value = preset.hairLength;
+      look.muscle = preset.muscle; sliderEls.muscle.value = preset.muscle;
+      look.bodyWidth = preset.bodyWidth; sliderEls.bodyWidth.value = preset.bodyWidth;
+      applyLook();
+    });
+  });
+
+  applyLook();
+
+  /* ---------------- AUDIO ---------------- */
+  let audioCtx = null;
+  let bgmMasterGain = null;
+  function ensureAudio(){
+    if(!audioCtx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if(audioCtx && !bgmMasterGain){
+      bgmMasterGain = audioCtx.createGain();
+      bgmMasterGain.gain.value = bgmMuted ? 0 : 0.32;
+      bgmMasterGain.connect(audioCtx.destination);
+    }
+  }
+
+  function noiseBuffer(ctx, seconds, decay){
+    const size = Math.max(1, Math.floor(ctx.sampleRate * seconds));
+    const buffer = ctx.createBuffer(1, size, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<size;i++){
+      data[i] = (Math.random()*2-1) * Math.pow(1 - i/size, decay);
+    }
+    return buffer;
+  }
+
+  /* ---------------- BGM: synthesized battle-loop (no external audio files) ---------------- */
+  let bgmMuted = false;
+  let bgmPlaying = false;
+  let bgmSchedulerId = null;
+  let bgmNextStepTime = 0;
+  let bgmStepIndex = 0;
+  const BGM_BPM = 152;
+  const BGM_STEP_SECONDS = 60 / BGM_BPM / 2; // 8th-note steps
+  // 16-step driving pattern: 4-on-the-floor kick, backbeat snare, steady hats, urgent bass riff
+  const BGM_KICK_STEPS = [0,4,8,12];
+  const BGM_SNARE_STEPS = [4,12];
+  const BGM_BASS_NOTES = [110,110,146.8,110, 110,110,164.8,146.8, 110,110,146.8,110, 110,110,196,164.8];
+
+  function bgmKick(time){
+    const ctx = audioCtx;
+    const osc = ctx.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(150, time);
+    osc.frequency.exponentialRampToValueAtTime(45, time+0.11);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.9, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time+0.16);
+    osc.connect(g).connect(bgmMasterGain);
+    osc.start(time); osc.stop(time+0.17);
+  }
+  function bgmSnare(time){
+    const ctx = audioCtx;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.14, 1.0);
+    const bp = ctx.createBiquadFilter(); bp.type='highpass'; bp.frequency.value=900;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.55, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time+0.13);
+    noise.connect(bp).connect(g).connect(bgmMasterGain);
+    noise.start(time);
+  }
+  function bgmHat(time, accent){
+    const ctx = audioCtx;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.04, 1.6);
+    const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=6500;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(accent ? 0.22 : 0.11, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time+0.035);
+    noise.connect(hp).connect(g).connect(bgmMasterGain);
+    noise.start(time);
+  }
+  function bgmBass(time, freq){
+    const ctx = audioCtx;
+    const osc = ctx.createOscillator(); osc.type='sawtooth';
+    osc.frequency.value = freq;
+    const filter = ctx.createBiquadFilter(); filter.type='lowpass';
+    filter.frequency.setValueAtTime(1100, time);
+    filter.frequency.exponentialRampToValueAtTime(300, time+BGM_STEP_SECONDS*0.9);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.001, time);
+    g.gain.exponentialRampToValueAtTime(0.28, time+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, time+BGM_STEP_SECONDS*0.92);
+    osc.connect(filter).connect(g).connect(bgmMasterGain);
+    osc.start(time); osc.stop(time+BGM_STEP_SECONDS);
+  }
+
+  function bgmScheduleStep(step, time){
+    if(BGM_KICK_STEPS.includes(step)) bgmKick(time);
+    if(BGM_SNARE_STEPS.includes(step)) bgmSnare(time);
+    bgmHat(time, step % 4 === 2);
+    bgmBass(time, BGM_BASS_NOTES[step]);
+  }
+
+  function bgmSchedulerTick(){
+    while(bgmNextStepTime < audioCtx.currentTime + 0.1){
+      bgmScheduleStep(bgmStepIndex, bgmNextStepTime);
+      bgmNextStepTime += BGM_STEP_SECONDS;
+      bgmStepIndex = (bgmStepIndex + 1) % 16;
+    }
+  }
+
+  function startBGM(){
+    if(!audioCtx || !bgmMasterGain || bgmPlaying) return;
+    bgmPlaying = true;
+    bgmStepIndex = 0;
+    bgmNextStepTime = audioCtx.currentTime + 0.05;
+    bgmSchedulerId = setInterval(bgmSchedulerTick, 25);
+  }
+  function stopBGM(){
+    bgmPlaying = false;
+    if(bgmSchedulerId){ clearInterval(bgmSchedulerId); bgmSchedulerId = null; }
+  }
+  function toggleBGM(){
+    bgmMuted = !bgmMuted;
+    if(bgmMasterGain){
+      bgmMasterGain.gain.setTargetAtTime(bgmMuted ? 0 : 0.32, audioCtx.currentTime, 0.05);
+    }
+    bgmToggleBtn.textContent = bgmMuted ? '🔇' : '🔊';
+  }
+  const bgmToggleBtn = document.getElementById('bgmToggle');
+  bgmToggleBtn.addEventListener('click', toggleBGM);
+
+
+  function playHit(tier){
+    if(!audioCtx) return;
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    const rand = 0.92 + Math.random()*0.16;
+
+    const crack = ctx.createBufferSource();
+    crack.buffer = noiseBuffer(ctx, 0.02, 1.2);
+    const crackFilter = ctx.createBiquadFilter();
+    crackFilter.type = 'highpass'; crackFilter.frequency.value = 1500;
+    const crackGain = ctx.createGain();
+    crackGain.gain.setValueAtTime(0.55 + tier*0.18, now);
+    crackGain.gain.exponentialRampToValueAtTime(0.001, now+0.035);
+    crack.connect(crackFilter).connect(crackGain).connect(ctx.destination);
+    crack.start(now);
+
+    const thump = ctx.createBufferSource();
+    thump.buffer = noiseBuffer(ctx, 0.22, 1.4);
+    const thumpFilter = ctx.createBiquadFilter();
+    thumpFilter.type = 'lowpass'; thumpFilter.frequency.value = 900 + tier*450;
+    const thumpGain = ctx.createGain();
+    thumpGain.gain.value = 0.42 + tier*0.2;
+    thump.connect(thumpFilter).connect(thumpGain).connect(ctx.destination);
+    thump.start(now);
+
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    const baseFreq = (155 - tier*26) * rand;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(28, baseFreq*0.24), now+0.19);
+    const oGain = ctx.createGain();
+    oGain.gain.setValueAtTime(0.55 + tier*0.16, now);
+    oGain.gain.exponentialRampToValueAtTime(0.001, now+0.21);
+    osc.connect(oGain).connect(ctx.destination);
+    osc.start(now); osc.stop(now+0.22);
+  }
+
+  function playWetSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.18, 1.1);
+    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1200; bp.Q.value=0.8;
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    noise.connect(bp).connect(g).connect(ctx.destination); noise.start(now);
+    const osc = ctx.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(500, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now+0.18);
+    const og = ctx.createGain(); og.gain.setValueAtTime(0.3, now); og.gain.exponentialRampToValueAtTime(0.001, now+0.2);
+    osc.connect(og).connect(ctx.destination); osc.start(now); osc.stop(now+0.22);
+  }
+
+  function playGrossSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    const osc = ctx.createOscillator(); osc.type='sawtooth';
+    osc.frequency.setValueAtTime(100, now);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 28;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 22;
+    lfo.connect(lfoGain).connect(osc.frequency);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.35, now); g.gain.exponentialRampToValueAtTime(0.001, now+0.35);
+    osc.connect(g).connect(ctx.destination);
+    lfo.start(now); osc.start(now); osc.stop(now+0.36); lfo.stop(now+0.36);
+  }
+
+  function playMusicalSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    const osc = ctx.createOscillator(); osc.type='square';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(220, now+0.22);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.001, now); g.gain.exponentialRampToValueAtTime(0.3, now+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now+0.25);
+    osc.connect(g).connect(ctx.destination); osc.start(now); osc.stop(now+0.26);
+  }
+
+  function playPartySound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    [660, 880, 1100].forEach((f,i)=>{
+      const osc = ctx.createOscillator(); osc.type='triangle'; osc.frequency.value=f;
+      const g = ctx.createGain(); const t0 = now + i*0.05;
+      g.gain.setValueAtTime(0.001, t0); g.gain.exponentialRampToValueAtTime(0.25, t0+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+0.16);
+      osc.connect(g).connect(ctx.destination); osc.start(t0); osc.stop(t0+0.18);
+    });
+  }
+
+  function playHissSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.3, 0.6);
+    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3200; bp.Q.value=0.6;
+    const g = ctx.createGain(); g.gain.value=0.35;
+    noise.connect(bp).connect(g).connect(ctx.destination); noise.start(now);
+  }
+
+  function playWhooshSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.35, 0.9);
+    const bp = ctx.createBiquadFilter(); bp.type='bandpass';
+    bp.frequency.setValueAtTime(300, now);
+    bp.frequency.exponentialRampToValueAtTime(2200, now+0.3);
+    const g = ctx.createGain(); g.gain.value=0.4;
+    noise.connect(bp).connect(g).connect(ctx.destination); noise.start(now);
+  }
+
+  function playHitSound(type, tier){
+    if(type==='wet') playWetSound();
+    else if(type==='gross') playGrossSound();
+    else if(type==='musical') playMusicalSound();
+    else if(type==='party') playPartySound();
+    else if(type==='extinguish') playHissSound();
+    else if(type==='gust') playWhooshSound();
+    else playHit(tier);
+  }
+
+  function playMilestoneSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i)=>{
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      const gain = ctx.createGain();
+      const t0 = now + i*0.07;
+      gain.gain.setValueAtTime(0.001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.3, t0+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0+0.22);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0); osc.stop(t0+0.24);
+    });
+  }
+
+  function playKO(){
+    if(!audioCtx) return;
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now+0.5);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now+0.55);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now); osc.stop(now+0.56);
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.3, 1.1);
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.5;
+    noise.connect(noiseGain).connect(ctx.destination);
+    noise.start(now);
+  }
+
+  // 비명: 브라우저 내장 음성합성으로 실제 목소리를 재생하되(추가 네트워크 요청 없음),
+  // 과장된 만화식 비명 톤으로 재생 — 사실적인 고통 비명 재현은 하지 않음
+  let cachedVoices = [];
+  if('speechSynthesis' in window){
+    const loadVoices = ()=>{ cachedVoices = window.speechSynthesis.getVoices(); };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+  function pickVoice(){
+    const langPrefix = t('speechLang').slice(0,2);
+    return cachedVoices.find(v=>v.lang === t('speechLang')) || cachedVoices.find(v=>v.lang && v.lang.startsWith(langPrefix)) || null;
+  }
+
+  let lastYelpTime = 0;
+  function playYelp(intensity){
+    const now = performance.now();
+    if(now - lastYelpTime < 420) return;
+    lastYelpTime = now;
+
+    if('speechSynthesis' in window){
+      try{
+        window.speechSynthesis.cancel();
+        const words = t('yelps')[look.gender] || t('yelps').neutral;
+        const word = words[Math.floor(Math.random()*words.length)];
+        const utter = new SpeechSynthesisUtterance(word);
+        utter.lang = t('speechLang');
+        const v = pickVoice();
+        if(v) utter.voice = v;
+        utter.rate = 1.45 + intensity*0.2;
+        utter.pitch = look.gender === 'female' ? 1.7 : (look.gender === 'male' ? 0.7 : 1.15);
+        utter.volume = 0.9;
+        window.speechSynthesis.speak(utter);
+        return;
+      }catch(e){ /* fall through to synth tone */ }
+    }
+    if(!audioCtx) return;
+    const ctx = audioCtx;
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    const base = look.gender === 'female' ? 750 : (look.gender === 'male' ? 320 : 500);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 24;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = base*0.12;
+    lfo.connect(lfoGain).connect(osc.frequency);
+    osc.frequency.setValueAtTime(base, t0);
+    osc.frequency.linearRampToValueAtTime(base*1.7, t0+0.06);
+    osc.frequency.exponentialRampToValueAtTime(base*0.55, t0+0.2);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.3, t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+0.22);
+    osc.connect(gain).connect(ctx.destination);
+    lfo.start(t0); osc.start(t0); osc.stop(t0+0.24); lfo.stop(t0+0.24);
+  }
+
+  /* ---------------- WEAPONS (comedic / non-lethal only) ---------------- */
+  const WEAPON_DEFS = [
+    {key:'fist', emoji:'👊', type:'blunt'},
+    {key:'hammer', emoji:'🔨', type:'blunt'},
+    {key:'cushion', emoji:'🛋️', type:'blunt'},
+    {key:'papers', emoji:'📄', type:'blunt'},
+    {key:'keyboard', emoji:'⌨️', type:'blunt'},
+    {key:'chicken', emoji:'🐔', type:'blunt'},
+    {key:'slipper', emoji:'🩴', type:'blunt'},
+    {key:'pan', emoji:'🍳', type:'blunt'},
+    {key:'books', emoji:'📚', type:'blunt'},
+    {key:'broom', emoji:'🧹', type:'blunt'},
+    {key:'glove', emoji:'🥊', type:'blunt'},
+    {key:'toiletpaper', emoji:'🧻', type:'blunt'},
+    {key:'waterballoon', emoji:'💧', type:'wet'},
+    {key:'fish', emoji:'🐟', type:'wet'},
+    {key:'confetti', emoji:'🎉', type:'party'},
+    {key:'extinguisher', emoji:'🧯', type:'extinguish'},
+    {key:'fan', emoji:'🪭', type:'gust'},
+    {key:'fart', emoji:'💨', type:'gross'},
+    {key:'sock', emoji:'🧦', type:'gross'},
+    {key:'sax', emoji:'🎷', type:'musical'},
+  ];
+  const WEAPON_MAP = {};
+  WEAPON_DEFS.forEach(w => WEAPON_MAP[w.key] = w);
+
+  const TYPE_REACT_ICON = { wet:'😱', gross:'🤢', musical:'😵', party:'😲', extinguish:'😨', gust:'😮' };
+  const TYPE_DEBRIS = {
+    blunt:['⭐','💛','🧵','🪶','📎','💥','✨'],
+    wet:['💦','💧','🫧'],
+    gross:['💨','🌫️'],
+    musical:['🎵','🎶'],
+    party:['🎊','🎉','✨'],
+    extinguish:['❄️','💨'],
+    gust:['💨','🍃'],
+  };
+  const TYPE_BURST_KEY = { wet:'burstWet', gross:'burstGross', musical:'burstMusical', party:'burstParty', extinguish:'burstHiss', gust:'burstGust' };
+
+  let selectedWeaponKey = 'random';
+  function renderWeaponBar(){
+    weaponBar.innerHTML = '';
+    const randomBtn = document.createElement('button');
+    randomBtn.className = 'weaponBtn' + (selectedWeaponKey==='random' ? ' selected' : '');
+    randomBtn.textContent = '🎲';
+    randomBtn.title = t('randomLabel');
+    randomBtn.addEventListener('click', ()=>{ selectedWeaponKey='random'; renderWeaponBar(); });
+    weaponBar.appendChild(randomBtn);
+
+    WEAPON_DEFS.forEach(w=>{
+      const btn = document.createElement('button');
+      btn.className = 'weaponBtn' + (selectedWeaponKey===w.key ? ' selected' : '');
+      btn.textContent = w.emoji;
+      btn.title = t('weapons')[w.key];
+      btn.addEventListener('click', ()=>{ selectedWeaponKey = w.key; renderWeaponBar(); });
+      weaponBar.appendChild(btn);
+    });
+  }
+
+  const MILESTONE_N = [10, 20, 35, 50];
+  let milestonesHit = new Set();
+
+  let stress = 100;
+  let combo = 0;
+  let maxCombo = 0;
+  let timeLeft = 30;
+  let timerId = null;
+  let running = false;
+  let weaponCount = {};
+  let comboResetTimer = null;
+  let bruiseNodes = [];
+  let currentExprLevel = 0;
+
+  function resetGame(){
+    stress = 100; combo = 0; maxCombo = 0; timeLeft = 30;
+    weaponCount = {}; milestonesHit = new Set();
+    currentExprLevel = 0;
+    gaugeFill.style.width = '100%';
+    timeLeftEl.textContent = timeLeft;
+    comboLabel.textContent = 'COMBO 0';
+    comboLabel.classList.remove('show');
+    dummy.classList.remove('dizzy');
+    dummy.style.transition = 'none';
+    dummy.style.transform = '';
+    dummy.style.opacity = '1';
+    orbit.style.opacity = 0;
+    patches.forEach(p => p.style.opacity = 0);
+    gmTorso.classList.remove('expr-1','expr-2','expr-3','reaction-gross','reaction-wet');
+    bruiseNodes.forEach(n => n.remove());
+    bruiseNodes = [];
+    finishOverlay.classList.remove('show');
+    finishText.textContent = '';
+    signBoard.textContent = '"' + (enteredReason || t('reasonDefault')) + '"';
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+
+  beginBtn.addEventListener('click', () => {
+    ensureAudio();
+    targetName.textContent = enteredName || t('emptyNameFallback');
+    resetGame();
+    showScreen(gameScreen);
+    running = true;
+    startTimer();
+    startBGM();
+  });
+
+  function startTimer(){
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      timeLeft -= 1;
+      timeLeftEl.textContent = timeLeft;
+      if(timeLeft <= 0){ endGame(false); }
+    }, 1000);
+  }
+
+  function screenFlash(strength){
+    flashEl.style.transition = 'none';
+    flashEl.style.opacity = strength;
+    requestAnimationFrame(()=>{
+      flashEl.style.transition = 'opacity .15s ease';
+      flashEl.style.opacity = 0;
+    });
+  }
+
+  function endGame(finisher){
+    running = false;
+    clearInterval(timerId);
+    stopBGM();
+    const stressDrop = 100 - stress;
+    const calmGain = Math.round(stressDrop * 0.4 + maxCombo * 1.5);
+    let topWeaponKey = null;
+    let topCount = 0;
+    for(const key in weaponCount){
+      if(weaponCount[key] > topCount){ topCount = weaponCount[key]; topWeaponKey = key; }
+    }
+
+    function reveal(){
+      finishOverlay.classList.remove('show');
+      finishText.textContent = '';
+
+      let headlineKey;
+      if(stressDrop >= 95) headlineKey = 'great';
+      else if(stressDrop >= 70) headlineKey = 'good';
+      else if(stressDrop >= 40) headlineKey = 'ok';
+      else headlineKey = 'low';
+
+      document.getElementById('resultTitle').textContent = targetName.textContent + t('resultTitleSuffix');
+      document.getElementById('resultHeadline').textContent = t('headlines')[headlineKey];
+      document.getElementById('stressResult').textContent = '-' + stressDrop;
+      document.getElementById('calmResult').textContent = '+' + calmGain;
+      document.getElementById('comboResult').textContent = maxCombo;
+      document.getElementById('weaponResult').textContent = topWeaponKey ? t('weapons')[topWeaponKey] : '-';
+      showScreen(resultScreen);
+    }
+
+    if(finisher){
+      playKO();
+      screenFlash(0.55);
+      document.body.classList.add('screenshake');
+      finishText.textContent = 'KNOCK OUT!!';
+      finishOverlay.classList.add('show');
+      dummy.style.transition = 'transform .6s cubic-bezier(.5,-0.4,.6,1.2), opacity .6s ease';
+      dummy.style.transform = 'translate(140%,-60%) rotate(340deg) scale(0.6)';
+      dummy.style.opacity = '0';
+      setTimeout(()=> document.body.classList.remove('screenshake'), 320);
+      setTimeout(reveal, 950);
+    } else {
+      setTimeout(reveal, 150);
+    }
+  }
+
+  retryBtn.addEventListener('click', () => {
+    showScreen(startScreen);
+    nameInput.value = '';
+    reasonInput.value = '';
+    nameInput.focus();
+  });
+
+  function spawnFx(x, y, weaponKey, intensity){
+    const def = WEAPON_MAP[weaponKey];
+    const type = def.type;
+    const fx = document.createElement('div');
+    fx.className = 'weapon-fx';
+    fx.textContent = def.emoji;
+    fx.style.left = (x - 23) + 'px';
+    fx.style.top = (y - 23) + 'px';
+    fx.style.transform = 'scale(0.4) rotate(' + (Math.random()*40-20) + 'deg)';
+    fx.style.transition = 'transform .25s ease, opacity .25s ease';
+    arena.appendChild(fx);
+    requestAnimationFrame(()=>{
+      fx.style.transform = 'scale(' + (1.2 + intensity*0.25) + ') rotate(' + (Math.random()*40-20) + 'deg)';
+      fx.style.opacity = '0';
+    });
+    setTimeout(()=> fx.remove(), 260);
+
+    let pool;
+    if(type === 'blunt'){
+      pool = intensity === 2 ? t('burstHigh') : (intensity === 1 ? t('burstMid') : t('burstLow'));
+    } else {
+      pool = t(TYPE_BURST_KEY[type]);
+    }
+    const burst = document.createElement('div');
+    burst.className = 'burst';
+    burst.textContent = pool[Math.floor(Math.random()*pool.length)];
+    burst.style.left = (x - 10 + (Math.random()*30-15)) + 'px';
+    burst.style.top = (y - 30) + 'px';
+    burst.style.fontSize = '0px';
+    burst.style.color = intensity === 2 ? 'var(--purple)' : (intensity === 1 ? 'var(--hotpink)' : '#ff7a3d');
+    burst.style.transition = 'font-size .2s ease, transform .3s ease, opacity .3s ease';
+    arena.appendChild(burst);
+    requestAnimationFrame(()=>{
+      burst.style.fontSize = (20 + intensity*8 + Math.random()*10) + 'px';
+      burst.style.transform = 'translateY(-' + (24 + intensity*8) + 'px) rotate(' + (Math.random()*20-10) + 'deg)';
+    });
+    setTimeout(()=>{ burst.style.opacity='0'; }, 200);
+    setTimeout(()=> burst.remove(), 500);
+
+    const debrisPool = TYPE_DEBRIS[type];
+    const count = 3 + intensity*2;
+    for(let i=0;i<count;i++){
+      const d = document.createElement('div');
+      d.className = 'debris';
+      d.textContent = debrisPool[Math.floor(Math.random()*debrisPool.length)];
+      d.style.left = x + 'px';
+      d.style.top = y + 'px';
+      d.style.transition = 'transform .5s ease-out, opacity .5s ease-out';
+      arena.appendChild(d);
+      const angle = Math.random()*Math.PI*2;
+      const dist = 40 + Math.random()*60 + intensity*20;
+      requestAnimationFrame(()=>{
+        d.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist - 20}px) rotate(${Math.random()*360}deg)`;
+        d.style.opacity = '0';
+      });
+      setTimeout(()=> d.remove(), 520);
+    }
+
+    // extra reaction icon above the head for non-blunt weapon types (variety cue)
+    if(TYPE_REACT_ICON[type]){
+      const arenaRect = arena.getBoundingClientRect();
+      const ri = document.createElement('div');
+      ri.className = 'reactIcon';
+      ri.textContent = TYPE_REACT_ICON[type];
+      ri.style.left = (arenaRect.width/2) + 'px';
+      ri.style.top = (arenaRect.height*0.16) + 'px';
+      arena.appendChild(ri);
+      requestAnimationFrame(()=>{
+        ri.style.opacity = '1';
+        ri.style.transform = 'translate(-50%,-50%) scale(1.1)';
+      });
+      setTimeout(()=>{ ri.style.opacity='0'; ri.style.transform='translate(-50%,-50%) scale(0.7)'; }, 380);
+      setTimeout(()=> ri.remove(), 650);
+
+      if(type==='gross') gmTorso.classList.add('reaction-gross');
+      if(type==='wet') gmTorso.classList.add('reaction-wet');
+      setTimeout(()=>{ gmTorso.classList.remove('reaction-gross','reaction-wet'); }, 400);
+    }
+  }
+
+  function spawnBruise(clientX, clientY, intensity){
+    const rect = gmTorso.getBoundingClientRect();
+    const bx = clientX - rect.left;
+    const by = clientY - rect.top;
+    if(bx < 0 || by < 0 || bx > rect.width || by > rect.height) return;
+
+    const size = 22 + intensity*10 + Math.random()*10;
+    const b = document.createElement('div');
+    b.className = 'bruise';
+    b.style.left = bx + 'px';
+    b.style.top = by + 'px';
+    b.style.width = size + 'px';
+    b.style.height = size + 'px';
+    gmTorso.appendChild(b);
+    requestAnimationFrame(()=>{
+      b.style.opacity = String(0.55 + intensity*0.15);
+      b.style.transform = 'translate(-50%,-50%) scale(1)';
+    });
+    bruiseNodes.push(b);
+    if(bruiseNodes.length > 14){
+      const old = bruiseNodes.shift();
+      old.style.opacity = '0';
+      setTimeout(()=> old.remove(), 300);
+    }
+  }
+
+  function updateExpression(){
+    let level = 0;
+    if(stress < 70) level = 1;
+    if(stress < 45) level = 2;
+    if(stress < 20) level = 3;
+    if(level !== currentExprLevel){
+      gmTorso.classList.remove('expr-1','expr-2','expr-3');
+      if(level > 0) gmTorso.classList.add('expr-' + level);
+      currentExprLevel = level;
+    }
+  }
+
+  function showMilestone(n){
+    if(!MILESTONE_N.includes(n) || milestonesHit.has(n)) return;
+    milestonesHit.add(n);
+    playMilestoneSound();
+    const idx = MILESTONE_N.indexOf(n);
+    const el = document.createElement('div');
+    el.className = 'milestone';
+    el.textContent = t('milestones')[idx];
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.transition = 'transform .3s cubic-bezier(.3,1.7,.4,1), opacity .3s ease';
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-50%) scale(1.15) rotate(-2deg)';
+    });
+    setTimeout(()=>{ el.style.opacity='0'; }, 550);
+    setTimeout(()=> el.remove(), 850);
+    screenFlash(0.2);
+  }
+
+  arena.addEventListener('pointerdown', (e) => {
+    if(!running) return;
+
+    const rect = arena.getBoundingClientRect();
+    const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
+    const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
+
+    combo++;
+    if(combo > maxCombo) maxCombo = combo;
+    comboLabel.textContent = 'COMBO ' + combo;
+    comboLabel.classList.add('show');
+    clearTimeout(comboResetTimer);
+    comboResetTimer = setTimeout(()=>{
+      combo = 0;
+      comboLabel.classList.remove('show');
+    }, 900);
+
+    const intensity = combo >= 20 ? 2 : (combo >= 8 ? 1 : 0);
+
+    const weaponKey = selectedWeaponKey === 'random'
+      ? WEAPON_DEFS[Math.floor(Math.random()*WEAPON_DEFS.length)].key
+      : selectedWeaponKey;
+    const weaponType = WEAPON_MAP[weaponKey].type;
+    weaponCount[weaponKey] = (weaponCount[weaponKey] || 0) + 1;
+    spawnFx(x, y, weaponKey, intensity);
+    spawnBruise(e.clientX ?? (rect.left+rect.width/2), e.clientY ?? (rect.top+rect.height/2), intensity);
+    playHitSound(weaponType, intensity);
+    playYelp(intensity);
+    showMilestone(combo);
+
+    const dmg = 2 + Math.min(8, Math.floor(combo/3)) + intensity*2;
+    stress = Math.max(0, stress - dmg);
+    gaugeFill.style.width = stress + '%';
+    updateExpression();
+
+    dummy.classList.remove('shake','shake-hard','flyback','squash','gust');
+    void dummy.offsetWidth;
+    if(weaponType === 'gust'){ dummy.classList.add('gust'); }
+    else if(intensity === 2){ dummy.classList.add('shake-hard'); }
+    else if(combo % 2 === 0){ dummy.classList.add('flyback'); }
+    else { dummy.classList.add('squash'); }
+
+    // NOTE: a full-screen flash used to fire every 5th combo hit here.
+    // On rapid taps that made the whole screen strobe white repeatedly,
+    // which read as flicker/blackout — removed. Flash is now reserved
+    // for milestones and the KO finisher only, where it's a one-off beat.
+
+    if(stress < 75) patches[0].style.opacity = 1;
+    if(stress < 55) patches[2].style.opacity = 1;
+    if(stress < 35) patches[1].style.opacity = 1;
+    if(stress < 20) patches[3].style.opacity = 1;
+    if(stress < 10) patches[4].style.opacity = 1;
+
+    if(stress <= 15){ dummy.classList.add('dizzy'); orbit.style.opacity = 1; }
+
+    if(combo % 6 === 0){
+      document.body.classList.add('shake');
+      setTimeout(()=> document.body.classList.remove('shake'), 280);
+    }
+
+    if(stress <= 0){ endGame(true); }
+  });
+
+  applyI18n();
+})();
+</script>
+</body>
+</html>
