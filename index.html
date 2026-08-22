@@ -21,7 +21,7 @@
     --purple:#8b5cf6;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
-  html{ color-scheme: light; }
+  html{ color-scheme: light; overflow-anchor: none; }
   html,body{
     margin:0; padding:0; height:100%;
     background:var(--cream);
@@ -46,6 +46,10 @@
     opacity:0; pointer-events:none;
     transition:opacity .25s ease;
     overflow-y:auto;
+    overflow-anchor:none; /* BUGFIX: prevents the browser from silently
+      re-scrolling this element to "preserve" the user's scroll position
+      when the hidden layout changes underneath it — this was fighting our
+      own scroll resets and reintroducing the blank-space bug. */
   }
   .screen.active{ opacity:1; pointer-events:auto; }
 
@@ -192,7 +196,6 @@
     margin-top:14px; display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
   .dummy{ width:74%; height:82%; position:relative; transform-origin:center bottom; }
-  .rope{ position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:6px; height:42px; background:var(--ink); }
 
   .torso{
     position:absolute; left:50%; bottom:0; transform:translateX(-50%);
@@ -613,7 +616,6 @@
   <div class="weaponBar" id="weaponBar"></div>
 
   <div class="arena" id="arena">
-    <div class="rope"></div>
     <div class="dummy" id="dummy">
       <div class="torso" id="gm_torso">
         <div class="shoulder left" id="gm_shL"></div>
@@ -1726,7 +1728,10 @@
     });
     setTimeout(()=>{ el.style.opacity='0'; }, 550);
     setTimeout(()=> el.remove(), 850);
-    screenFlash(0.2);
+    // NOTE: this used to also call screenFlash(0.2) here — a brief full-screen
+    // white flash on every milestone. Combined with frequent combo hits it
+    // read as an intermittent "screen turning off and on" glitch, so it's
+    // been removed. The popup banner + sound alone are enough of a beat.
   }
 
   arena.addEventListener('pointerdown', (e) => {
