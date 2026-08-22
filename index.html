@@ -98,6 +98,14 @@
   .bigbtn:active{ transform:translate(4px,4px); box-shadow:2px 2px 0 var(--ink); }
   #start .sub, #reason .sub{ margin-top:12px; font-size:13px; color:#555; max-width:320px; word-break:keep-all; }
 
+  .randomBtn{
+    font-family:'Jua',sans-serif; font-size:14px; color:var(--ink);
+    background:#fff; border:3px solid var(--ink); border-radius:12px;
+    padding:8px 16px; cursor:pointer; box-shadow:3px 3px 0 var(--ink);
+    margin-top:-4px; margin-bottom:16px;
+  }
+  .randomBtn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+
   /* ---------- REASON SCREEN ---------- */
   #reason{ justify-content:center; }
 
@@ -129,6 +137,25 @@
     font-size:12px; color:#999; text-align:left; margin:14px 0 4px;
     border-top:2px dashed #ddd; padding-top:10px;
   }
+  .cust-category{
+    border:3px solid var(--ink); border-radius:14px; margin:12px 0;
+    overflow:hidden; background:#fff;
+  }
+  .cust-cat-header{
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    padding:11px 16px; background:#fff; border:none; cursor:pointer;
+    font-family:'Jua',sans-serif; font-size:15px; color:var(--ink);
+  }
+  .cust-cat-header .chevron{ transition:transform .2s ease; color:#999; }
+  .cust-category.open .cust-cat-header{ border-bottom:3px solid var(--ink); }
+  .cust-category.open .cust-cat-header .chevron{ transform:rotate(180deg); }
+  .cust-cat-body{
+    max-height:0; overflow:hidden;
+    transition:max-height .25s ease, padding .25s ease;
+    padding:0 16px;
+  }
+  .cust-category.open .cust-cat-body{ max-height:600px; padding:12px 16px 16px; }
+  .cust-category .cust-row:first-child{ margin-top:0; }
   .cust-row{ text-align:left; margin:10px 0; }
   .cust-label{ font-size:13px; color:#444; margin-bottom:5px; display:flex; justify-content:space-between; }
   .cust-label span.tag{ color:#999; font-size:11px; }
@@ -172,6 +199,17 @@
     height:100%; background:linear-gradient(90deg, var(--hotpink), #ff7a3d);
     width:100%; transition:width .12s ease;
   }
+  .ultimate-fill{
+    background:linear-gradient(90deg, #8b5cf6, #3ec6ff);
+    width:0%;
+  }
+  .ultimate-track.ready{
+    animation: ultimatePulse .6s ease-in-out infinite;
+  }
+  @keyframes ultimatePulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(139,92,246,0.6); }
+    50%{ box-shadow:0 0 0 8px rgba(139,92,246,0); }
+  }
   #targetName{
     font-family:'Jua',sans-serif; font-size:clamp(19px,5.6vw,28px);
     background:#fff; border:4px solid var(--ink); border-radius:12px;
@@ -187,9 +225,17 @@
   .weaponBtn{
     flex:0 0 auto; width:38px; height:38px; font-size:19px;
     border:3px solid var(--ink); border-radius:10px; background:#fff; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+    display:flex; align-items:center; justify-content:center; position:relative;
   }
   .weaponBtn.selected{ background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+  .weaponBtn.locked{ opacity:0.35; cursor:not-allowed; filter:grayscale(1); }
+  .weaponBtn.locked::after{
+    content:"🔒"; position:absolute; bottom:-4px; right:-4px; font-size:11px;
+  }
+
+  .styleTitleBadge{
+    background:var(--purple) !important; color:#fff; margin-top:-8px; margin-bottom:10px;
+  }
 
   .arena{
     position:relative; width:min(320px,78vw); height:min(340px,80vw);
@@ -197,53 +243,100 @@
   }
   .dummy{ width:74%; height:82%; position:relative; transform-origin:center bottom; }
 
+  /* 머리 (기존 torso — 몸 전체가 아니라 이제 머리만 담당) */
   .torso{
-    position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-    height:100%; overflow:visible;
+    position:absolute; left:50%; top:0; transform:translateX(-50%);
+    width:64%; height:54%; overflow:visible;
     border:6px solid var(--ink);
-    border-radius:44% 44% 52% 52% / 58% 58% 42% 42%;
-    box-shadow: inset -12px -14px 0 rgba(0,0,0,0.08);
+    border-radius:46% 46% 38% 38% / 56% 56% 40% 40%;
+    box-shadow: inset -10px -12px 0 rgba(0,0,0,0.08);
     transition:border-radius .15s ease, filter .2s ease;
+    z-index:2;
   }
-  .shoulder{
-    position:absolute; top:16%; border-radius:50%;
+  /* 목 — 테두리 없이 피부색만 채워서 머리/몸통 사이를 자연스럽게 이어줌 */
+  .neckShape{
+    position:absolute; left:50%; top:48%; transform:translateX(-50%);
+    width:26%; height:12%; z-index:1;
+  }
+  /* 몸통/어깨 — 근육량·체형 슬라이더가 이 너비를 조절 */
+  .bodyShape{
+    position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+    width:78%; height:42%;
     border:6px solid var(--ink);
+    border-radius:32% 32% 12% 12% / 22% 22% 8% 8%;
+    box-shadow: inset -8px -10px 0 rgba(0,0,0,0.06);
+    transition:width .15s ease;
     z-index:0;
   }
-  .shoulder.left{ left:-2%; }
-  .shoulder.right{ right:-2%; }
 
-  .hairCap{
-    position:absolute; top:-4%; left:50%; transform:translateX(-50%);
-    width:66%; height:13%;
-    border-radius:50% 50% 8% 8% / 75% 75% 8% 8%;
-    border:5px solid var(--ink); border-bottom:none;
-    z-index:1; transition:opacity .15s ease;
+  .ear{
+    position:absolute; top:34%; width:14%; aspect-ratio:1/1.25;
+    border-radius:50%; border:5px solid var(--ink); z-index:0;
+    transition:width .15s ease, height .15s ease;
   }
-  .hairSide{
-    position:absolute; top:0%; width:13%;
-    border-radius:0 0 50% 50%;
-    border:5px solid var(--ink); border-top:none;
-    z-index:1; transition:height .15s ease, opacity .15s ease;
+  .ear.left{ left:-5%; }
+  .ear.right{ right:-5%; }
+
+  .beard{
+    position:absolute; left:50%; top:73%; transform:translateX(-50%);
+    width:40%; height:20%;
+    border-radius:50% 50% 45% 45% / 45% 45% 55% 55%;
+    border:5px solid var(--ink); z-index:2;
+    opacity:0; transition:opacity .15s ease;
   }
-  .hairSide.left{ left:1%; }
-  .hairSide.right{ right:1%; }
+
+  .doubleChin{
+    position:absolute; left:50%; bottom:2%; transform:translateX(-50%);
+    border-radius:50%; border:4px solid var(--ink); z-index:0;
+    opacity:0; transition:opacity .15s ease, width .15s ease, height .15s ease;
+  }
+
+  .freckles{
+    position:absolute; top:40%; width:16%; height:12%; opacity:0; z-index:2;
+    pointer-events:none; transition:opacity .15s ease;
+    background-image:
+      radial-gradient(circle, rgba(120,72,40,0.55) 30%, transparent 32%),
+      radial-gradient(circle, rgba(120,72,40,0.5) 30%, transparent 32%),
+      radial-gradient(circle, rgba(120,72,40,0.5) 30%, transparent 32%),
+      radial-gradient(circle, rgba(120,72,40,0.45) 30%, transparent 32%);
+    background-size: 34% 34%;
+    background-position: 10% 20%, 60% 8%, 25% 62%, 68% 55%;
+    background-repeat:no-repeat;
+  }
+  .freckles.left{ left:6%; }
+  .freckles.right{ right:6%; }
+
+  .mole{
+    position:absolute; top:49%; left:58%; width:3%; aspect-ratio:1/1;
+    border-radius:50%; background:#3a2a1a; opacity:0; z-index:2;
+    pointer-events:none; transition:opacity .15s ease;
+  }
+
+  .hairSvg{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    z-index:1; overflow:visible; pointer-events:none;
+  }
+  .hairSvg path.strand{ transition:d .15s ease; }
 
   .face{
     position:absolute; top:32%; left:50%; transform:translate(-50%,-50%);
-    display:flex; gap:10%; width:60%; justify-content:center; z-index:3;
+    width:60%; height:1px; z-index:3; pointer-events:none;
   }
   .brow{
     position:absolute; width:15%; height:4px; background:var(--ink);
-    top:16%; border-radius:3px; transition:transform .15s ease; z-index:3;
+    border-radius:3px; transition:transform .15s ease, top .15s ease, left .15s ease; z-index:3;
   }
-  .brow.left{ left:20%; transform:rotate(8deg); }
-  .brow.right{ right:20%; transform:rotate(-8deg); }
+  .brow.left{ transform:rotate(8deg); }
+  .brow.right{ transform:rotate(-8deg); }
+  .eyelidCrease{
+    position:absolute; border-top:2.5px solid rgba(0,0,0,0.35);
+    border-radius:50%; z-index:3; pointer-events:none;
+  }
   .eye{
-    aspect-ratio:1/1; border-radius:50%; position:relative;
+    position:absolute; aspect-ratio:1/1; border-radius:50%;
     background:#fff; border:3px solid var(--ink);
     display:flex; align-items:center; justify-content:center;
-    transition:height .15s ease;
+    transition:height .15s ease, top .15s ease, left .15s ease, width .15s ease;
   }
   .pupil{ width:58%; aspect-ratio:1/1; border-radius:50%; }
   .nose{
@@ -260,8 +353,11 @@
   }
   .dizzy .eye{ visibility:hidden; }
   .dizzy .face::before, .dizzy .face::after{
-    content:"✕"; font-family:sans-serif; font-weight:900; font-size:22px; color:var(--ink); line-height:1;
+    content:"✕"; position:absolute; top:0; font-family:sans-serif; font-weight:900;
+    font-size:22px; color:var(--ink); line-height:1;
   }
+  .dizzy .face::before{ left:20%; }
+  .dizzy .face::after{ right:20%; }
 
   .expr-1 .brow.left{ transform:rotate(16deg); }
   .expr-1 .brow.right{ transform:rotate(-16deg); }
@@ -287,8 +383,8 @@
     border-radius:50% 50% 50% 0; transform:rotate(45deg);
     opacity:0; z-index:4;
   }
-  .tear.left{ top:44%; left:29%; }
-  .tear.right{ top:44%; right:29%; }
+  .tear.left{ top:40%; left:33%; }
+  .tear.right{ top:40%; right:33%; }
   .expr-2 .tear, .expr-3 .tear{ animation: tearDrip 1s ease-in infinite; }
   .expr-2 .tear.right, .expr-3 .tear.right{ animation-delay:.4s; }
   @keyframes tearDrip{
@@ -366,6 +462,16 @@
     -webkit-text-stroke:3px var(--ink); opacity:0; pointer-events:none; z-index:8; white-space:nowrap;
   }
 
+  .tauntBubble{
+    position:absolute; top:6%; left:72%;
+    background:#fff; border:4px solid var(--ink); border-radius:16px 16px 16px 4px;
+    padding:6px 12px; font-family:'Jua',sans-serif; font-size:15px; color:var(--ink);
+    box-shadow:3px 3px 0 var(--ink); white-space:nowrap;
+    opacity:0; transform:translate(-50%,-50%) scale(0.3) rotate(-4deg);
+    pointer-events:none; z-index:10;
+    transition:transform .25s cubic-bezier(.3,1.7,.4,1), opacity .25s ease;
+  }
+
   .signPost{
     position:absolute; left:-4%; bottom:2%; display:flex; flex-direction:column; align-items:center;
     z-index:4; pointer-events:none;
@@ -405,6 +511,29 @@
   @keyframes gustsway{
     0%{ transform: rotate(0) translateX(0); } 30%{ transform: rotate(-10deg) translateX(-14px); }
     70%{ transform: rotate(4deg) translateX(6px); } 100%{ transform: rotate(0) translateX(0); }
+  }
+  .critZoom{ animation: critZoom .3s ease-out; }
+  @keyframes critZoom{
+    0%{ transform: scale(1); } 35%{ transform: scale(1.18); } 100%{ transform: scale(1); }
+  }
+  .ultimateZoom{ animation: ultimateZoom .5s ease-out; }
+  @keyframes ultimateZoom{
+    0%{ transform: scale(1) rotate(0); } 25%{ transform: scale(1.3) rotate(-4deg); }
+    50%{ transform: scale(0.92) rotate(3deg); } 100%{ transform: scale(1) rotate(0); }
+  }
+  .critText{
+    position:absolute; font-family:'Jua',sans-serif; font-size:0px;
+    color:var(--yellow); -webkit-text-stroke:3px var(--ink); pointer-events:none;
+    z-index:9; white-space:nowrap; top:20%; left:50%;
+    transform:translate(-50%,-50%) scale(0.3) rotate(-6deg); opacity:0;
+    transition:font-size .18s ease, transform .25s cubic-bezier(.3,1.7,.4,1), opacity .3s ease;
+  }
+  .ultimateText{
+    position:absolute; font-family:'Jua',sans-serif; font-size:0px;
+    color:var(--purple); -webkit-text-stroke:4px var(--ink); pointer-events:none;
+    z-index:9; white-space:nowrap; top:30%; left:50%;
+    transform:translate(-50%,-50%) scale(0.2) rotate(-8deg); opacity:0;
+    transition:font-size .2s ease, transform .3s cubic-bezier(.3,1.7,.4,1), opacity .3s ease;
   }
   body.screenshake{ animation: bodyshake .3s; }
   @keyframes bodyshake{
@@ -473,6 +602,7 @@
   <div class="badge" data-i18n="badge">STRESS SMASH</div>
   <h1><span data-i18n="titleLine1">오늘</span><br><span data-i18n="titleLine2">어떤 새끼 때문에</span><br><span data-i18n="titleLine3">빡쳤나요?</span></h1>
   <input id="nameInput" type="text" maxlength="12" data-i18n-placeholder="namePlaceholder" placeholder="이름(or 별명)을 적어주세요">
+  <button class="randomBtn" id="randomNameBtn" data-i18n="randomNameBtn">🎲 아무나 뽑아줘</button>
   <button class="bigbtn" id="nextBtn" data-i18n="nextBtn">다음 →</button>
 </div>
 
@@ -492,20 +622,27 @@
   <div class="customize-box">
     <div class="customize-title" data-i18n="customizeTitle">샌드백 커스터마이징</div>
     <div class="preview-wrap">
-      <div class="dummy" id="previewDummy" style="width:130px;height:170px;">
+      <div class="dummy" id="previewDummy" style="width:130px;height:190px;">
+        <div class="bodyShape" id="pv_body"></div>
+        <div class="neckShape" id="pv_neck"></div>
         <div class="torso" id="pv_torso">
-          <div class="shoulder left" id="pv_shL"></div>
-          <div class="shoulder right" id="pv_shR"></div>
-          <div class="hairCap" id="pv_hairCap"></div>
-          <div class="hairSide left" id="pv_hairL"></div>
-          <div class="hairSide right" id="pv_hairR"></div>
-          <div class="face">
-            <div class="brow left"></div><div class="brow right"></div>
-            <div class="eye" id="pv_eyeL"><div class="pupil" id="pv_pupil1"></div></div>
-            <div class="eye" id="pv_eyeR"><div class="pupil" id="pv_pupil2"></div></div>
-          </div>
+          <div class="ear left" id="pv_earL"></div><div class="ear right" id="pv_earR"></div>
+          <svg class="hairSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="pv_hairPath" stroke="#151316" stroke-width="3"></path>
+            <path class="strand" id="pv_strand1" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
+            <path class="strand" id="pv_strand2" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
+          </svg>
+          <div class="face"></div>
+          <div class="brow left" id="pv_browL"></div><div class="brow right" id="pv_browR"></div>
+          <div class="eyelidCrease" id="pv_lidL"></div><div class="eyelidCrease" id="pv_lidR"></div>
+          <div class="eye" id="pv_eyeL"><div class="pupil" id="pv_pupil1"></div></div>
+          <div class="eye" id="pv_eyeR"><div class="pupil" id="pv_pupil2"></div></div>
           <div class="nose" id="pv_nose"></div>
+          <div class="freckles left" id="pv_freckleL"></div><div class="freckles right" id="pv_freckleR"></div>
+          <div class="mole" id="pv_mole"></div>
+          <div class="beard" id="pv_beard"></div>
           <div class="mouth" id="pv_mouth"></div>
+          <div class="doubleChin" id="pv_chin"></div>
         </div>
       </div>
     </div>
@@ -523,73 +660,156 @@
       <span class="cust-label" data-i18n="skinLabel">피부색</span>
       <div class="swatches" data-target="skin">
         <div class="swatch selected" style="background:#ffd400" data-value="#ffd400"></div>
+        <div class="swatch" style="background:#ffe0bd" data-value="#ffe0bd"></div>
         <div class="swatch" style="background:#ffb877" data-value="#ffb877"></div>
         <div class="swatch" style="background:#e8967a" data-value="#e8967a"></div>
+        <div class="swatch" style="background:#8d5524" data-value="#8d5524"></div>
         <div class="swatch" style="background:#a9dfff" data-value="#a9dfff"></div>
         <div class="swatch" style="background:#c9f7c1" data-value="#c9f7c1"></div>
         <div class="swatch" style="background:#d6b8ff" data-value="#d6b8ff"></div>
       </div>
     </div>
 
-    <div class="section-divider" data-i18n="sectionFace">얼굴</div>
-
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="hairColorLabel">머리색</span>
-      <div class="swatches" data-target="hair">
-        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
-        <div class="swatch" style="background:#6b3f1d" data-value="#6b3f1d"></div>
-        <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
-        <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
-        <div class="swatch" style="background:#f4f4f4" data-value="#f4f4f4"></div>
-        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+    <!-- 얼굴 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catFace">얼굴</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="faceShapeLabel">얼굴 형태</span>
+          <div class="genderRow" id="faceShapeRow">
+            <button class="genderBtn selected" data-value="oval" data-i18n="faceShapeOval">계란형</button>
+            <button class="genderBtn" data-value="round" data-i18n="faceShapeRound">둥근형</button>
+            <button class="genderBtn" data-value="square" data-i18n="faceShapeSquare">각진형</button>
+            <button class="genderBtn" data-value="heart" data-i18n="faceShapeHeart">하트형</button>
+          </div>
+        </div>
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="beardLabel">수염</span>
+          <div class="genderRow" id="beardRow">
+            <button class="genderBtn selected" data-value="off" data-i18n="beardOff">없음</button>
+            <button class="genderBtn" data-value="on" data-i18n="beardOn">있음</button>
+          </div>
+        </div>
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="freckleLabel">주근깨</span>
+          <div class="genderRow" id="freckleRow">
+            <button class="genderBtn selected" data-value="off" data-i18n="freckleOff">없음</button>
+            <button class="genderBtn" data-value="on" data-i18n="freckleOn">있음</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="hairLengthLabel">머리 길이</span>
-      <input type="range" id="hairLength" min="0" max="100" value="35">
-    </div>
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="eyeColorLabel">눈동자색</span>
-      <div class="swatches" data-target="eye">
-        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
-        <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
-        <div class="swatch" style="background:#3ddc84" data-value="#3ddc84"></div>
-        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
-        <div class="swatch" style="background:#a0603a" data-value="#a0603a"></div>
+
+    <!-- 눈 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catEye">눈</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="eyeColorLabel">눈동자색</span>
+          <div class="swatches" data-target="eye">
+            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
+            <div class="swatch" style="background:#3ddc84" data-value="#3ddc84"></div>
+            <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+            <div class="swatch" style="background:#a0603a" data-value="#a0603a"></div>
+          </div>
+        </div>
+        <div class="cust-row">
+          <span class="cust-label"><span data-i18n="eyeSizeLabel">눈 크기</span> <span class="tag" data-i18n="eyeSizeTag">작게 ↔ 크게</span></span>
+          <input type="range" id="eyeSize" min="60" max="150" value="100">
+        </div>
       </div>
     </div>
-    <div class="cust-row">
-      <span class="cust-label"><span data-i18n="eyeSizeLabel">눈 크기</span> <span class="tag" data-i18n="eyeSizeTag">작게 ↔ 크게</span></span>
-      <input type="range" id="eyeSize" min="60" max="150" value="100">
-    </div>
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="noseSizeLabel">코 크기</span>
-      <input type="range" id="noseSize" min="40" max="160" value="90">
-    </div>
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="lipColorLabel">입술색</span>
-      <div class="swatches" data-target="lip">
-        <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
-        <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
-        <div class="swatch" style="background:#c0392b" data-value="#c0392b"></div>
-        <div class="swatch" style="background:#e67e22" data-value="#e67e22"></div>
-        <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+
+    <!-- 코 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catNose">코</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="noseSizeLabel">코 크기</span>
+          <input type="range" id="noseSize" min="40" max="160" value="90">
+        </div>
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="moleLabel">코 옆 점</span>
+          <div class="genderRow" id="moleRow">
+            <button class="genderBtn selected" data-value="off" data-i18n="moleOff">없음</button>
+            <button class="genderBtn" data-value="on" data-i18n="moleOn">있음</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="cust-row">
-      <span class="cust-label" data-i18n="lipSizeLabel">입술 크기</span>
-      <input type="range" id="lipSize" min="60" max="160" value="100">
+
+    <!-- 입 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catMouth">입</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="lipColorLabel">입술색</span>
+          <div class="swatches" data-target="lip">
+            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
+            <div class="swatch" style="background:#c0392b" data-value="#c0392b"></div>
+            <div class="swatch" style="background:#e67e22" data-value="#e67e22"></div>
+            <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+          </div>
+        </div>
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="lipSizeLabel">입술 크기</span>
+          <input type="range" id="lipSize" min="60" max="160" value="100">
+        </div>
+      </div>
     </div>
 
-    <div class="section-divider" data-i18n="sectionBody">체형</div>
-
-    <div class="cust-row">
-      <span class="cust-label"><span data-i18n="bodyWidthLabel">체형</span> <span class="tag" data-i18n="bodyWidthTag">날씬 ↔ 통통</span></span>
-      <input type="range" id="bodyWidth" min="55" max="100" value="82">
+    <!-- 머리 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catHair">머리</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="hairColorLabel">머리색</span>
+          <div class="swatches" data-target="hair">
+            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch" style="background:#6b3f1d" data-value="#6b3f1d"></div>
+            <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
+            <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
+            <div class="swatch" style="background:#f4f4f4" data-value="#f4f4f4"></div>
+            <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
+          </div>
+        </div>
+        <div class="cust-row">
+          <span class="cust-label" data-i18n="hairLengthLabel">머리 길이</span>
+          <input type="range" id="hairLength" min="0" max="100" value="35">
+        </div>
+      </div>
     </div>
-    <div class="cust-row">
-      <span class="cust-label"><span data-i18n="muscleLabel">근육량</span> <span class="tag" data-i18n="muscleTag">보통 ↔ 우락부락</span></span>
-      <input type="range" id="muscle" min="0" max="100" value="35">
+
+    <!-- 귀 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catEar">귀</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label"><span data-i18n="earSizeLabel">귀 크기</span> <span class="tag" data-i18n="earSizeTag">작게 ↔ 크게</span></span>
+          <input type="range" id="earSize" min="60" max="160" value="100">
+        </div>
+      </div>
+    </div>
+
+    <!-- 체형 -->
+    <div class="cust-category">
+      <button class="cust-cat-header" type="button"><span data-i18n="catBody">체형</span><span class="chevron">▾</span></button>
+      <div class="cust-cat-body">
+        <div class="cust-row">
+          <span class="cust-label"><span data-i18n="bodyWidthLabel">체형</span> <span class="tag" data-i18n="bodyWidthTag">날씬 ↔ 통통</span></span>
+          <input type="range" id="bodyWidth" min="55" max="100" value="82">
+        </div>
+        <div class="cust-row">
+          <span class="cust-label"><span data-i18n="muscleLabel">근육량</span> <span class="tag" data-i18n="muscleTag">보통 ↔ 우락부락</span></span>
+          <input type="range" id="muscle" min="0" max="100" value="35">
+        </div>
+        <div class="cust-row">
+          <span class="cust-label"><span data-i18n="chubbyLabel">살집</span> <span class="tag" data-i18n="chubbyTag">보통 ↔ 통통</span></span>
+          <input type="range" id="chubby" min="0" max="100" value="0">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -609,6 +829,10 @@
       <div class="gauge-label" data-i18n="stressLabel">스트레스</div>
       <div class="gauge-track"><div class="gauge-fill" id="gaugeFill"></div></div>
     </div>
+    <div class="gauge-wrap">
+      <div class="gauge-label" data-i18n="ultimateLabel">필살기</div>
+      <div class="gauge-track ultimate-track" id="ultimateTrack"><div class="gauge-fill ultimate-fill" id="ultimateFill"></div></div>
+    </div>
   </div>
 
   <div id="targetName">이름</div>
@@ -617,20 +841,27 @@
 
   <div class="arena" id="arena">
     <div class="dummy" id="dummy">
+      <div class="bodyShape" id="gm_body"></div>
+      <div class="neckShape" id="gm_neck"></div>
       <div class="torso" id="gm_torso">
-        <div class="shoulder left" id="gm_shL"></div>
-        <div class="shoulder right" id="gm_shR"></div>
-        <div class="hairCap" id="gm_hairCap"></div>
-        <div class="hairSide left" id="gm_hairL"></div>
-        <div class="hairSide right" id="gm_hairR"></div>
-        <div class="face" id="face">
-          <div class="brow left"></div><div class="brow right"></div>
-          <div class="eye" id="gm_eyeL"><div class="pupil" id="gm_pupil1"></div></div>
-          <div class="eye" id="gm_eyeR"><div class="pupil" id="gm_pupil2"></div></div>
-          <div class="tear left"></div><div class="tear right"></div>
-        </div>
+        <div class="ear left" id="gm_earL"></div><div class="ear right" id="gm_earR"></div>
+        <svg class="hairSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path id="gm_hairPath" stroke="#151316" stroke-width="3"></path>
+          <path class="strand" id="gm_strand1" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
+          <path class="strand" id="gm_strand2" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
+        </svg>
+        <div class="face" id="face"></div>
+        <div class="brow left" id="gm_browL"></div><div class="brow right" id="gm_browR"></div>
+        <div class="eyelidCrease" id="gm_lidL"></div><div class="eyelidCrease" id="gm_lidR"></div>
+        <div class="eye" id="gm_eyeL"><div class="pupil" id="gm_pupil1"></div></div>
+        <div class="eye" id="gm_eyeR"><div class="pupil" id="gm_pupil2"></div></div>
+        <div class="tear left" id="gm_tearL"></div><div class="tear right" id="gm_tearR"></div>
         <div class="nose" id="gm_nose"></div>
+        <div class="freckles left" id="gm_freckleL"></div><div class="freckles right" id="gm_freckleR"></div>
+        <div class="mole" id="gm_mole"></div>
+        <div class="beard" id="gm_beard"></div>
         <div class="mouth" id="gm_mouth"></div>
+        <div class="doubleChin" id="gm_chin"></div>
         <div class="huff left"></div><div class="huff right"></div>
         <div class="orbit" id="orbit">
           <span>⭐</span><span>💫</span><span>⭐</span><span>💫</span>
@@ -665,6 +896,7 @@
   <div class="badge" data-i18n="resultBadge">RESULT</div>
   <p id="resultTitle"></p>
   <h2 id="resultHeadline"></h2>
+  <div class="badge styleTitleBadge" id="styleTitleBadge" style="display:none;"></div>
   <div class="resultCard">
     <div class="resultRow"><span data-i18n="stressLabel">스트레스</span><b class="stress-down" id="stressResult">-0</b></div>
     <div class="resultRow"><span data-i18n="calmLabel">평정심</span><b class="calm-up" id="calmResult">+0</b></div>
@@ -672,6 +904,7 @@
     <div class="resultRow"><span data-i18n="weaponLabel">가장 많이 쓴 무기</span><b id="weaponResult">-</b></div>
   </div>
   <button class="bigbtn" id="retryBtn" data-i18n="retryBtn">한 판 더 패기</button>
+  <button class="randomBtn" id="shareBtn" data-i18n="shareBtn">📸 결과 이미지 저장</button>
 </div>
 
 <script>
@@ -697,6 +930,11 @@
       genderLabel:'성별', genderNeutral:'중성', genderMale:'남성', genderFemale:'여성',
       skinLabel:'피부색',
       sectionFace:'얼굴',
+      catFace:'얼굴', catEye:'눈', catNose:'코', catMouth:'입', catHair:'머리', catEar:'귀', catBody:'체형',
+      faceShapeLabel:'얼굴 형태',
+      faceShapeOval:'계란형', faceShapeRound:'둥근형', faceShapeSquare:'각진형', faceShapeHeart:'하트형',
+      freckleLabel:'주근깨', freckleOff:'없음', freckleOn:'있음',
+      moleLabel:'코 옆 점', moleOff:'없음', moleOn:'있음',
       hairColorLabel:'머리색', hairLengthLabel:'머리 길이',
       eyeColorLabel:'눈동자색', eyeSizeLabel:'눈 크기', eyeSizeTag:'작게 ↔ 크게',
       noseSizeLabel:'코 크기',
@@ -704,6 +942,10 @@
       sectionBody:'체형',
       bodyWidthLabel:'체형', bodyWidthTag:'날씬 ↔ 통통',
       muscleLabel:'근육량', muscleTag:'보통 ↔ 우락부락',
+      sectionDetail:'디테일',
+      beardLabel:'수염', beardOff:'없음', beardOn:'있음',
+      chubbyLabel:'살집', chubbyTag:'보통 ↔ 통통',
+      earSizeLabel:'귀 크기', earSizeTag:'작게 ↔ 크게',
       startBtn:'패러 가기 →',
       startSub:'※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다 😌',
       tapHint:'화면을 마구 두드려서 스트레스를 날려버리세요!',
@@ -724,6 +966,19 @@
       burstParty:['짜잔!','와아!'], burstHiss:['치이익!'], burstGust:['휘이잉~'],
       milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','전설의 손맛 👑'],
       yelps:{ male:['윽!','으악!','아야!'], female:['꺄악!','아앗!','악!'], neutral:['으악!','악!','윽!'] },
+      taunts:['안 아픈데?','응 어쩔','그게 다야?','간지러운데','더 세게 때려봐','느낌도 없다','약한데?','이 정도로 되겠어?'],
+      ultimateLabel:'필살기',
+      randomNameBtn:'🎲 아무나 뽑아줘',
+      randomNamePresets:['옆팀 김대리','단톡방 프사 안 바꾸는 애','발표 5분 전에 자료 바꾸는 팀장','택배 상하차 시키는 사장님','지하철에서 이어폰 안 낀 사람','카톡 3일째 읽씹인 친구','내 앞에서 새치기한 사람','알람 5번 미루고 나만 깨우는 룸메','회의 끝나고 다시 잡자는 사람','내 아이디어 자기 것처럼 말하는 동료'],
+      shareBtn:'📸 결과 이미지 저장',
+      lockedHint:'아직 잠겨있어요',
+      critText:'크리티컬!!',
+      ultimateReadyHint:'꽉 찼다! 한 번 더 탭!',
+      ultimateHitText:'필살기!!!',
+      styleTitles:{
+        oneTrack:'외길 인생', terrorist:'테러리스트', collector:'무기 수집가',
+        coolHead:'냉정과 열정 사이', impatient:'성격 급함', perfectionist:'완벽주의자'
+      },
       speechLang:'ko-KR', emptyNameFallback:'그 새끼'
     },
     en: {
@@ -745,6 +1000,11 @@
       genderLabel:'Gender', genderNeutral:'Neutral', genderMale:'Male', genderFemale:'Female',
       skinLabel:'Skin tone',
       sectionFace:'Face',
+      catFace:'Face', catEye:'Eyes', catNose:'Nose', catMouth:'Mouth', catHair:'Hair', catEar:'Ears', catBody:'Body',
+      faceShapeLabel:'Face shape',
+      faceShapeOval:'Oval', faceShapeRound:'Round', faceShapeSquare:'Square', faceShapeHeart:'Heart',
+      freckleLabel:'Freckles', freckleOff:'None', freckleOn:'Yes',
+      moleLabel:'Beauty mark', moleOff:'None', moleOn:'Yes',
       hairColorLabel:'Hair color', hairLengthLabel:'Hair length',
       eyeColorLabel:'Eye color', eyeSizeLabel:'Eye size', eyeSizeTag:'Small ↔ Big',
       noseSizeLabel:'Nose size',
@@ -752,6 +1012,10 @@
       sectionBody:'Body',
       bodyWidthLabel:'Body type', bodyWidthTag:'Slim ↔ Wide',
       muscleLabel:'Muscle mass', muscleTag:'Average ↔ Jacked',
+      sectionDetail:'Details',
+      beardLabel:'Beard', beardOff:'None', beardOn:'Yes',
+      chubbyLabel:'Body fat', chubbyTag:'Average ↔ Chubby',
+      earSizeLabel:'Ear size', earSizeTag:'Small ↔ Big',
       startBtn:'Start smashing →',
       startSub:'※ Instead of a real photo, a custom sandbag character takes the hits for you 😌',
       tapHint:'Tap the screen like crazy and blast your stress away!',
@@ -772,6 +1036,19 @@
       burstParty:['TA-DA!','WOO!'], burstHiss:['PSHHH!'], burstGust:['WHOOSH!'],
       milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','Legendary hands 👑'],
       yelps:{ male:['Ugh!','Ow!','Argh!'], female:['Eek!','Yikes!','Ow!'], neutral:['Ow!','Ugh!','Ouch!'] },
+      taunts:["Didn't feel a thing","So what?","Is that all you got?","That tickles","Hit harder","Nothing happened","Weak.","You call that a hit?"],
+      ultimateLabel:'Ultimate',
+      randomNameBtn:'🎲 Pick someone for me',
+      randomNamePresets:['That guy from marketing','My group chat\'s silent reader','The boss who "needs it by EOD"','My neighbor\'s car alarm','The line-cutter at the coffee shop','My roommate who never does dishes','The reply-all email guy','My landlord','The friend who left me on read for 3 days','The coworker who takes credit for my ideas'],
+      shareBtn:'📸 Save result image',
+      lockedHint:'Still locked',
+      critText:'CRITICAL!!',
+      ultimateReadyHint:'Charged up! Tap again!',
+      ultimateHitText:'ULTIMATE!!!',
+      styleTitles:{
+        oneTrack:'One-Track Mind', terrorist:'Terrorist', collector:'Weapon Collector',
+        coolHead:'Cool Under Pressure', impatient:'Trigger Happy', perfectionist:'Perfectionist'
+      },
       speechLang:'en-US', emptyNameFallback:'that jerk'
     }
   };
@@ -808,6 +1085,7 @@
   const gameScreen = document.getElementById('game');
   const resultScreen = document.getElementById('result');
   const nameInput = document.getElementById('nameInput');
+  const randomNameBtn = document.getElementById('randomNameBtn');
   const reasonInput = document.getElementById('reasonInput');
   const nextBtn = document.getElementById('nextBtn');
   const reasonBackBtn = document.getElementById('reasonBackBtn');
@@ -815,6 +1093,10 @@
   const backBtn = document.getElementById('backBtn');
   const beginBtn = document.getElementById('beginBtn');
   const retryBtn = document.getElementById('retryBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const styleTitleBadge = document.getElementById('styleTitleBadge');
+  const ultimateFill = document.getElementById('ultimateFill');
+  const ultimateTrack = document.getElementById('ultimateTrack');
   const targetName = document.getElementById('targetName');
   const arena = document.getElementById('arena');
   const dummy = document.getElementById('dummy');
@@ -922,6 +1204,10 @@
     afterKeyboardCloses(()=> showScreen(reasonScreen));
   });
   nameInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') nextBtn.click(); });
+  randomNameBtn.addEventListener('click', ()=>{
+    const presets = t('randomNamePresets');
+    nameInput.value = presets[Math.floor(Math.random()*presets.length)];
+  });
 
   reasonNextBtn.addEventListener('click', ()=>{
     enteredReason = reasonInput.value.trim();
@@ -942,7 +1228,9 @@
     skin:'#ffd400', hair:'#151316', hairLength:35,
     eye:'#151316', eyeSize:100, noseSize:90,
     lip:'#151316', lipSize:100,
-    bodyWidth:82, muscle:35
+    bodyWidth:82, muscle:35,
+    beard:false, chubby:0, earSize:100,
+    faceShape:'oval', freckles:false, mole:false
   };
 
   const GENDER_PRESETS = {
@@ -951,49 +1239,155 @@
     female:  { hairLength:70, muscle:18, bodyWidth:72 },
   };
 
+  const FACE_SHAPES = {
+    oval:   '46% 46% 38% 38% / 56% 56% 40% 40%',
+    round:  '50% 50% 50% 50% / 55% 55% 50% 50%',
+    square: '28% 28% 22% 22% / 32% 32% 24% 24%',
+    heart:  '50% 50% 28% 28% / 60% 60% 24% 24%',
+  };
+
   const els = {
     pv: {
       torso: document.getElementById('pv_torso'),
-      shL: document.getElementById('pv_shL'), shR: document.getElementById('pv_shR'),
-      hairCap: document.getElementById('pv_hairCap'),
-      hairL: document.getElementById('pv_hairL'), hairR: document.getElementById('pv_hairR'),
+      body: document.getElementById('pv_body'), neck: document.getElementById('pv_neck'),
+      earL: document.getElementById('pv_earL'), earR: document.getElementById('pv_earR'),
+      hairPath: document.getElementById('pv_hairPath'),
+      strand1: document.getElementById('pv_strand1'), strand2: document.getElementById('pv_strand2'),
+      browL: document.getElementById('pv_browL'), browR: document.getElementById('pv_browR'),
+      lidL: document.getElementById('pv_lidL'), lidR: document.getElementById('pv_lidR'),
       eyeL: document.getElementById('pv_eyeL'), eyeR: document.getElementById('pv_eyeR'),
       pupil1: document.getElementById('pv_pupil1'), pupil2: document.getElementById('pv_pupil2'),
-      nose: document.getElementById('pv_nose'), mouth: document.getElementById('pv_mouth')
+      nose: document.getElementById('pv_nose'), mouth: document.getElementById('pv_mouth'),
+      beard: document.getElementById('pv_beard'), chin: document.getElementById('pv_chin'),
+      freckleL: document.getElementById('pv_freckleL'), freckleR: document.getElementById('pv_freckleR'),
+      mole: document.getElementById('pv_mole')
     },
     gm: {
       torso: document.getElementById('gm_torso'),
-      shL: document.getElementById('gm_shL'), shR: document.getElementById('gm_shR'),
-      hairCap: document.getElementById('gm_hairCap'),
-      hairL: document.getElementById('gm_hairL'), hairR: document.getElementById('gm_hairR'),
+      body: document.getElementById('gm_body'), neck: document.getElementById('gm_neck'),
+      earL: document.getElementById('gm_earL'), earR: document.getElementById('gm_earR'),
+      hairPath: document.getElementById('gm_hairPath'),
+      strand1: document.getElementById('gm_strand1'), strand2: document.getElementById('gm_strand2'),
+      browL: document.getElementById('gm_browL'), browR: document.getElementById('gm_browR'),
+      lidL: document.getElementById('gm_lidL'), lidR: document.getElementById('gm_lidR'),
       eyeL: document.getElementById('gm_eyeL'), eyeR: document.getElementById('gm_eyeR'),
       pupil1: document.getElementById('gm_pupil1'), pupil2: document.getElementById('gm_pupil2'),
-      nose: document.getElementById('gm_nose'), mouth: document.getElementById('gm_mouth')
+      nose: document.getElementById('gm_nose'), mouth: document.getElementById('gm_mouth'),
+      beard: document.getElementById('gm_beard'), chin: document.getElementById('gm_chin'),
+      freckleL: document.getElementById('gm_freckleL'), freckleR: document.getElementById('gm_freckleR'),
+      mole: document.getElementById('gm_mole')
     }
   };
+
+  // 밝은 색(하이라이트용)을 만드는 헬퍼 — 머리카락 결(strand) 표현에 사용
+  function lightenHex(hex, amount){
+    const h = hex.replace('#','');
+    const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+    const lr = Math.round(r + (255-r)*amount);
+    const lg = Math.round(g + (255-g)*amount);
+    const lb = Math.round(b + (255-b)*amount);
+    return `rgb(${lr},${lg},${lb})`;
+  }
+
+  // 하나로 이어진 자연스러운 머리 모양(SVG) — 길이 슬라이더에 따라 옆머리가
+  // 매끄럽게 늘어남 (예전 "정수리 캡 + 귀 옆 가닥" 분리형 구조라 길이를
+  // 바꾸면 귀만 늘어나는 것처럼 보이던 문제를 근본적으로 해결)
+  function hairPathD(sideY){
+    return `M50,-3
+      C64,-4 74,-2 78,4
+      C84,8 84,14 82,20
+      C88,24 90,30 88,${sideY-6}
+      L86,${sideY}
+      C84,${sideY+5} 78,${sideY+2} 76,${sideY-10}
+      C74,${sideY-20} 74,10 72,2
+      C70,-2 60,-4 50,-3
+      C40,-4 30,-2 28,2
+      C26,10 26,${sideY-20} 24,${sideY-10}
+      C22,${sideY+2} 16,${sideY+5} 14,${sideY}
+      L12,${sideY-6}
+      C10,30 12,24 18,20
+      C16,14 16,8 22,4
+      C26,-2 36,-4 50,-3 Z`;
+  }
+  function hairStrand1D(sideY){
+    const y = 8 + sideY*0.5;
+    return `M30,4 C27,${y*0.5} 25,${y*0.8} 24,${y}`;
+  }
+  function hairStrand2D(sideY){
+    const y = 8 + sideY*0.5;
+    return `M70,4 C73,${y*0.5} 75,${y*0.8} 76,${y}`;
+  }
 
   function applyLook(){
     [els.pv, els.gm].forEach(el=>{
       el.torso.style.background = look.skin;
-      el.torso.style.width = look.bodyWidth + '%';
+      el.neck.style.background = look.skin;
+      el.body.style.background = look.skin;
 
-      const shSize = Math.round(10 + look.muscle * 0.32) + '%';
-      [el.shL, el.shR].forEach(s=>{
-        s.style.width = shSize; s.style.height = shSize; s.style.background = look.skin;
+      // 체형(허리 폭) + 근육량(어깨 폭)을 함께 반영해 몸통 너비를 계산
+      const bodyW = Math.min(100, look.bodyWidth * 0.9 + look.muscle * 0.22);
+      el.body.style.width = bodyW + '%';
+
+      // 살집: 머리 폭을 약간 넓히고, 턱 아래에 이중턱을 추가
+      const headW = 64 + look.chubby * 0.14;
+      el.torso.style.width = headW + '%';
+      el.torso.style.borderRadius = FACE_SHAPES[look.faceShape] || FACE_SHAPES.oval;
+      const chinW = look.chubby * 0.34;
+      const chinH = look.chubby * 0.13;
+      el.chin.style.width = chinW + '%';
+      el.chin.style.height = chinH + '%';
+      el.chin.style.background = look.skin;
+      el.chin.style.opacity = look.chubby > 5 ? Math.min(1, look.chubby/70) : 0;
+
+      // 귀
+      const earSizePct = 14 * (look.earSize/100);
+      [el.earL, el.earR].forEach(ear=>{
+        ear.style.width = earSizePct + '%';
+        ear.style.background = look.skin;
       });
+
+      // 주근깨 / 점
+      el.freckleL.style.opacity = look.freckles ? 1 : 0;
+      el.freckleR.style.opacity = look.freckles ? 1 : 0;
+      el.mole.style.opacity = look.mole ? 1 : 0;
 
       const hasHair = look.hairLength > 2;
-      el.hairCap.style.background = look.hair;
-      el.hairCap.style.opacity = hasHair ? 1 : 0;
-      const sideH = hasHair ? Math.round(10 + look.hairLength * 0.55) + '%' : '0%';
-      [el.hairL, el.hairR].forEach(s=>{
-        s.style.background = look.hair;
-        s.style.height = sideH;
-        s.style.opacity = hasHair ? 1 : 0;
+      const sideY = 14 + look.hairLength * 0.5; // 14(짧음) ~ 64(길게)
+      el.hairPath.setAttribute('d', hairPathD(sideY));
+      el.hairPath.setAttribute('fill', look.hair);
+      el.hairPath.style.opacity = hasHair ? 1 : 0;
+      const strandColor = lightenHex(look.hair, 0.45);
+      [el.strand1, el.strand2].forEach((s, i)=>{
+        s.setAttribute('d', i===0 ? hairStrand1D(sideY) : hairStrand2D(sideY));
+        s.setAttribute('stroke', strandColor);
+        s.style.opacity = hasHair ? 0.5 : 0;
       });
 
-      const eyeW = Math.round(16 * (look.eyeSize/100)) + '%';
-      el.eyeL.style.width = eyeW; el.eyeR.style.width = eyeW;
+      // 수염
+      el.beard.style.background = look.hair;
+      el.beard.style.opacity = look.beard ? 1 : 0;
+
+      // 눈/눈썹/쌍꺼풀은 고정된 중심(38%/62%)을 기준으로 크기만 변하고,
+      // 눈썹은 눈 크기와 무관하게 항상 일정한 간격을 유지하도록 직접 계산
+      // (예전엔 눈이 커지면 눈썹과 겹치는 버그가 있었음)
+      const eyeSizePct = 16 * (look.eyeSize/100) * 0.6; // torso 기준 실제 폭(%)
+      const browGap = 5.5;
+      const browWidthPct = 9;
+      [[el.eyeL, el.browL, el.lidL, 38], [el.eyeR, el.browR, el.lidR, 62]].forEach(([eyeEl, browEl, lidEl, centerX])=>{
+        const eyeTop = 32 - eyeSizePct/2;
+        eyeEl.style.width = eyeSizePct + '%';
+        eyeEl.style.left = (centerX - eyeSizePct/2) + '%';
+        eyeEl.style.top = eyeTop + '%';
+        browEl.style.top = (eyeTop - browGap) + '%';
+        browEl.style.left = (centerX - browWidthPct/2) + '%';
+
+        const lidW = eyeSizePct * 1.05;
+        const lidH = eyeSizePct * 0.5;
+        lidEl.style.width = lidW + '%';
+        lidEl.style.height = lidH + '%';
+        lidEl.style.left = (centerX - lidW/2) + '%';
+        lidEl.style.top = (eyeTop - lidH*0.45) + '%';
+      });
       el.pupil1.style.background = look.eye; el.pupil2.style.background = look.eye;
 
       const noseSizePx = Math.round(look.noseSize * 0.16);
@@ -1001,10 +1395,12 @@
       el.nose.style.height = Math.round(noseSizePx*0.8) + 'px';
 
       const lipScale = look.lipSize/100;
-      el.mouth.style.width = Math.round(34 * lipScale) + '%';
+      const mouthW = 34 * lipScale;
+      el.mouth.style.width = Math.round(mouthW) + '%';
       el.mouth.style.height = Math.round(12 * lipScale) + '%';
       el.mouth.style.borderColor = look.lip;
       el.mouth.style.borderWidth = Math.round(4 + lipScale*3) + 'px';
+      el.mouth.style.background = look.skin;
     });
   }
 
@@ -1039,10 +1435,12 @@
   bindSlider('lipSize','lipSize');
   bindSlider('bodyWidth','bodyWidth');
   bindSlider('muscle','muscle');
+  bindSlider('chubby','chubby');
+  bindSlider('earSize','earSize');
 
-  document.querySelectorAll('.genderBtn').forEach(btn=>{
+  document.querySelectorAll('#genderRow .genderBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.genderBtn').forEach(b=>b.classList.remove('selected'));
+      document.querySelectorAll('#genderRow .genderBtn').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       const g = btn.getAttribute('data-value');
       look.gender = g;
@@ -1051,6 +1449,49 @@
       look.muscle = preset.muscle; sliderEls.muscle.value = preset.muscle;
       look.bodyWidth = preset.bodyWidth; sliderEls.bodyWidth.value = preset.bodyWidth;
       applyLook();
+    });
+  });
+
+  document.querySelectorAll('#beardRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#beardRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      look.beard = btn.getAttribute('data-value') === 'on';
+      applyLook();
+    });
+  });
+
+  document.querySelectorAll('#faceShapeRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#faceShapeRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      look.faceShape = btn.getAttribute('data-value');
+      applyLook();
+    });
+  });
+
+  document.querySelectorAll('#freckleRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#freckleRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      look.freckles = btn.getAttribute('data-value') === 'on';
+      applyLook();
+    });
+  });
+
+  document.querySelectorAll('#moleRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#moleRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      look.mole = btn.getAttribute('data-value') === 'on';
+      applyLook();
+    });
+  });
+
+  // 대분류(얼굴/눈/코/입/머리/귀/체형) 아코디언 펼치기/접기
+  document.querySelectorAll('.cust-cat-header').forEach(header=>{
+    header.addEventListener('click', ()=>{
+      header.closest('.cust-category').classList.toggle('open');
     });
   });
 
@@ -1088,23 +1529,25 @@
   let bgmSchedulerId = null;
   let bgmNextStepTime = 0;
   let bgmStepIndex = 0;
-  const BGM_BPM = 152;
+  const BGM_BPM = 160;
   const BGM_STEP_SECONDS = 60 / BGM_BPM / 2; // 8th-note steps
-  // 16-step driving pattern: 4-on-the-floor kick, backbeat snare, steady hats, urgent bass riff
+  // 16-step bouncy, cheerful pattern: light kick, backbeat snare, steady hats,
+  // major-key bass with rests for bounce, playful pentatonic lead on top
   const BGM_KICK_STEPS = [0,4,8,12];
   const BGM_SNARE_STEPS = [4,12];
-  const BGM_BASS_NOTES = [110,110,146.8,110, 110,110,164.8,146.8, 110,110,146.8,110, 110,110,196,164.8];
+  const BGM_BASS_NOTES = [130.8,0,164.8,0, 196,0,164.8,0, 130.8,0,196,0, 164.8,0,196,0];
+  const BGM_LEAD_NOTES = [523.25,0,659.25,0, 783.99,0,659.25,0, 587.33,0,783.99,0, 880,0,783.99,0];
 
   function bgmKick(time){
     const ctx = audioCtx;
     const osc = ctx.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(150, time);
-    osc.frequency.exponentialRampToValueAtTime(45, time+0.11);
+    osc.frequency.setValueAtTime(170, time);
+    osc.frequency.exponentialRampToValueAtTime(65, time+0.09);
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.9, time);
-    g.gain.exponentialRampToValueAtTime(0.001, time+0.16);
+    g.gain.setValueAtTime(0.8, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time+0.13);
     osc.connect(g).connect(bgmMasterGain);
-    osc.start(time); osc.stop(time+0.17);
+    osc.start(time); osc.stop(time+0.14);
   }
   function bgmSnare(time){
     const ctx = audioCtx;
@@ -1123,24 +1566,37 @@
     noise.buffer = noiseBuffer(ctx, 0.04, 1.6);
     const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=6500;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(accent ? 0.22 : 0.11, time);
+    g.gain.setValueAtTime(accent ? 0.2 : 0.1, time);
     g.gain.exponentialRampToValueAtTime(0.001, time+0.035);
     noise.connect(hp).connect(g).connect(bgmMasterGain);
     noise.start(time);
   }
   function bgmBass(time, freq){
+    if(!freq) return;
     const ctx = audioCtx;
-    const osc = ctx.createOscillator(); osc.type='sawtooth';
+    const osc = ctx.createOscillator(); osc.type='triangle';
     osc.frequency.value = freq;
     const filter = ctx.createBiquadFilter(); filter.type='lowpass';
-    filter.frequency.setValueAtTime(1100, time);
-    filter.frequency.exponentialRampToValueAtTime(300, time+BGM_STEP_SECONDS*0.9);
+    filter.frequency.setValueAtTime(1300, time);
+    filter.frequency.exponentialRampToValueAtTime(400, time+BGM_STEP_SECONDS*1.6);
     const g = ctx.createGain();
     g.gain.setValueAtTime(0.001, time);
-    g.gain.exponentialRampToValueAtTime(0.28, time+0.01);
-    g.gain.exponentialRampToValueAtTime(0.001, time+BGM_STEP_SECONDS*0.92);
+    g.gain.exponentialRampToValueAtTime(0.26, time+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, time+BGM_STEP_SECONDS*1.7);
     osc.connect(filter).connect(g).connect(bgmMasterGain);
-    osc.start(time); osc.stop(time+BGM_STEP_SECONDS);
+    osc.start(time); osc.stop(time+BGM_STEP_SECONDS*1.8);
+  }
+  function bgmLead(time, freq){
+    if(!freq) return;
+    const ctx = audioCtx;
+    const osc = ctx.createOscillator(); osc.type='triangle';
+    osc.frequency.value = freq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.001, time);
+    g.gain.exponentialRampToValueAtTime(0.2, time+0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, time+BGM_STEP_SECONDS*1.6);
+    osc.connect(g).connect(bgmMasterGain);
+    osc.start(time); osc.stop(time+BGM_STEP_SECONDS*1.7);
   }
 
   function bgmScheduleStep(step, time){
@@ -1148,6 +1604,7 @@
     if(BGM_SNARE_STEPS.includes(step)) bgmSnare(time);
     bgmHat(time, step % 4 === 2);
     bgmBass(time, BGM_BASS_NOTES[step]);
+    bgmLead(time, BGM_LEAD_NOTES[step]);
   }
 
   function bgmSchedulerTick(){
@@ -1217,26 +1674,28 @@
     osc.start(now); osc.stop(now+0.22);
   }
 
-  function playWetSound(){
+  function playWetSound(pitchMul){
     if(!audioCtx) return;
+    pitchMul = pitchMul || 1;
     const ctx = audioCtx; const now = ctx.currentTime;
     const noise = ctx.createBufferSource();
     noise.buffer = noiseBuffer(ctx, 0.18, 1.1);
-    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1200; bp.Q.value=0.8;
+    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1200*pitchMul; bp.Q.value=0.8;
     const g = ctx.createGain(); g.gain.value = 0.5;
     noise.connect(bp).connect(g).connect(ctx.destination); noise.start(now);
     const osc = ctx.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(500, now);
-    osc.frequency.exponentialRampToValueAtTime(120, now+0.18);
+    osc.frequency.setValueAtTime(500*pitchMul, now);
+    osc.frequency.exponentialRampToValueAtTime(120*pitchMul, now+0.18);
     const og = ctx.createGain(); og.gain.setValueAtTime(0.3, now); og.gain.exponentialRampToValueAtTime(0.001, now+0.2);
     osc.connect(og).connect(ctx.destination); osc.start(now); osc.stop(now+0.22);
   }
 
-  function playGrossSound(){
+  function playGrossSound(pitchMul){
     if(!audioCtx) return;
+    pitchMul = pitchMul || 1;
     const ctx = audioCtx; const now = ctx.currentTime;
     const osc = ctx.createOscillator(); osc.type='sawtooth';
-    osc.frequency.setValueAtTime(100, now);
+    osc.frequency.setValueAtTime(100*pitchMul, now);
     const lfo = ctx.createOscillator(); lfo.frequency.value = 28;
     const lfoGain = ctx.createGain(); lfoGain.gain.value = 22;
     lfo.connect(lfoGain).connect(osc.frequency);
@@ -1290,9 +1749,109 @@
     noise.connect(bp).connect(g).connect(ctx.destination); noise.start(now);
   }
 
-  function playHitSound(type, tier){
-    if(type==='wet') playWetSound();
-    else if(type==='gross') playGrossSound();
+  /* ---------------- 무기별 개별 타격음 ----------------
+     하나의 파라미터 기반 신스 엔진으로 무기마다 다른 질감(크랙/몸통감/톤/금속울림/클릭)을
+     조합해서 20종 전부 다른 소리가 나도록 구성 */
+  function playParamHit(p, tier){
+    if(!audioCtx) return;
+    const ctx = audioCtx, now = ctx.currentTime;
+    const tierMul = 1 + tier*0.2;
+
+    if(p.crack){
+      const n = ctx.createBufferSource();
+      n.buffer = noiseBuffer(ctx, 0.02, 1.2);
+      const f = ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value = p.crackFreq || 1500;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.5*tierMul, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now+0.03);
+      n.connect(f).connect(g).connect(ctx.destination); n.start(now);
+    }
+    if(p.body){
+      const n = ctx.createBufferSource();
+      n.buffer = noiseBuffer(ctx, p.bodyDur || 0.2, p.bodyDecay || 1.3);
+      const f = ctx.createBiquadFilter(); f.type = p.bodyFilterType || 'lowpass';
+      f.frequency.value = (p.bodyFreq || 900) + tier*300;
+      const g = ctx.createGain(); g.gain.value = (p.bodyGain || 0.4) * tierMul;
+      n.connect(f).connect(g).connect(ctx.destination); n.start(now);
+    }
+    if(p.tone){
+      const osc = ctx.createOscillator(); osc.type = p.wave || 'triangle';
+      const base = (p.freq || 150) * (0.95 + Math.random()*0.1);
+      const dur = p.toneDur || 0.18;
+      osc.frequency.setValueAtTime(base, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, base*(p.freqRatio || 0.3)), now+dur);
+      if(p.vibratoRate){
+        const lfo = ctx.createOscillator(); lfo.frequency.value = p.vibratoRate;
+        const lg = ctx.createGain(); lg.gain.value = p.vibratoDepth || 10;
+        lfo.connect(lg).connect(osc.frequency);
+        lfo.start(now); lfo.stop(now+dur+0.05);
+      }
+      const g = ctx.createGain();
+      g.gain.setValueAtTime((p.toneGain || 0.5)*tierMul, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now+dur+0.02);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(now); osc.stop(now+dur+0.03);
+    }
+    if(p.ring){
+      [1, 1.6, 2.3].forEach((mult, i)=>{
+        const osc = ctx.createOscillator(); osc.type='sine';
+        osc.frequency.value = (p.ringFreq || 900) * mult;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.18*tierMul/(i+1), now);
+        g.gain.exponentialRampToValueAtTime(0.001, now+0.35);
+        osc.connect(g).connect(ctx.destination);
+        osc.start(now); osc.stop(now+0.36);
+      });
+    }
+    if(p.clicks){
+      for(let i=0;i<p.clicks;i++){
+        const t0 = now + i*0.028;
+        const n = ctx.createBufferSource();
+        n.buffer = noiseBuffer(ctx, 0.012, 1.5);
+        const f = ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value = 2600 + Math.random()*800;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.3*tierMul, t0);
+        g.gain.exponentialRampToValueAtTime(0.001, t0+0.02);
+        n.connect(f).connect(g).connect(ctx.destination); n.start(t0);
+      }
+    }
+  }
+
+  const WEAPON_SFX = {
+    fist:   { crack:true, crackFreq:1600, body:true, bodyFreq:900, bodyGain:0.45,
+              tone:true, wave:'triangle', freq:150, freqRatio:0.24, toneDur:0.19, toneGain:0.55 },
+    glove:  { crack:true, crackFreq:1700, body:true, bodyFreq:850, bodyGain:0.55,
+              tone:true, wave:'triangle', freq:170, freqRatio:0.2, toneDur:0.22, toneGain:0.65 },
+    slipper:{ crack:true, crackFreq:1300, body:true, bodyFreq:700, bodyGain:0.5,
+              tone:true, wave:'triangle', freq:130, freqRatio:0.22, toneDur:0.16, toneGain:0.5 },
+    hammer: { crack:true, crackFreq:2200, ring:true, ringFreq:1200,
+              tone:true, wave:'sine', freq:260, freqRatio:0.5, toneDur:0.12, toneGain:0.4 },
+    pan:    { crack:true, crackFreq:2500, ring:true, ringFreq:1500,
+              tone:true, wave:'square', freq:300, freqRatio:0.35, toneDur:0.15, toneGain:0.3 },
+    cushion:{ body:true, bodyFreq:500, bodyGain:0.5, bodyDur:0.28, bodyDecay:1.6,
+              tone:true, wave:'sine', freq:110, freqRatio:0.4, toneDur:0.22, toneGain:0.35 },
+    books:  { body:true, bodyFreq:400, bodyGain:0.6, bodyDur:0.3, bodyDecay:1.2,
+              tone:true, wave:'sine', freq:90, freqRatio:0.3, toneDur:0.25, toneGain:0.6 },
+    papers: { crack:true, crackFreq:3200, body:true, bodyFreq:2200, bodyFilterType:'highpass',
+              bodyGain:0.3, bodyDur:0.12, bodyDecay:1.9 },
+    broom:  { crack:true, crackFreq:3600, body:true, bodyFreq:1900, bodyFilterType:'highpass',
+              bodyGain:0.25, bodyDur:0.18, bodyDecay:1.5 },
+    toiletpaper:{ body:true, bodyFreq:650, bodyGain:0.22, bodyDur:0.15, bodyDecay:2.0 },
+    keyboard:{ clicks:5 },
+    chicken:{ crack:true, crackFreq:1800,
+              tone:true, wave:'square', freq:520, freqRatio:1.5, toneDur:0.15, toneGain:0.35,
+              vibratoRate:35, vibratoDepth:80 },
+  };
+
+  /* ---------------- 이미 있는 타입별(물/악취/음악/파티/소화기/바람) 사운드는 그대로 두되
+     같은 타입 안에서도 무기별로 음정을 조금씩 다르게 줘서 서로 구별되게 함 ---------------- */
+  function playHitSound(weaponKey, type, tier){
+    if(WEAPON_SFX[weaponKey]){
+      playParamHit(WEAPON_SFX[weaponKey], tier);
+      return;
+    }
+    if(type==='wet') playWetSound(weaponKey === 'fish' ? 0.75 : 1);
+    else if(type==='gross') playGrossSound(weaponKey === 'sock' ? 0.7 : 1);
     else if(type==='musical') playMusicalSound();
     else if(type==='party') playPartySound();
     else if(type==='extinguish') playHissSound();
@@ -1339,6 +1898,52 @@
     noiseGain.gain.value = 0.5;
     noise.connect(noiseGain).connect(ctx.destination);
     noise.start(now);
+  }
+
+  function playCritSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    [1046.5, 1318.5].forEach((f,i)=>{
+      const osc = ctx.createOscillator(); osc.type='sine'; osc.frequency.value = f;
+      const g = ctx.createGain();
+      const t0 = now + i*0.05;
+      g.gain.setValueAtTime(0.001, t0);
+      g.gain.exponentialRampToValueAtTime(0.35, t0+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+0.2);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(t0); osc.stop(t0+0.22);
+    });
+  }
+
+  function playUltimateSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx; const now = ctx.currentTime;
+    // rising sweep + impact boom, more dramatic than a regular KO
+    const sweep = ctx.createOscillator(); sweep.type='sawtooth';
+    sweep.frequency.setValueAtTime(200, now);
+    sweep.frequency.exponentialRampToValueAtTime(1400, now+0.35);
+    const sg = ctx.createGain();
+    sg.gain.setValueAtTime(0.001, now);
+    sg.gain.exponentialRampToValueAtTime(0.3, now+0.3);
+    sg.gain.exponentialRampToValueAtTime(0.001, now+0.4);
+    sweep.connect(sg).connect(ctx.destination);
+    sweep.start(now); sweep.stop(now+0.42);
+
+    const boomT = now + 0.35;
+    const osc = ctx.createOscillator(); osc.type='sawtooth';
+    osc.frequency.setValueAtTime(180, boomT);
+    osc.frequency.exponentialRampToValueAtTime(25, boomT+0.5);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.6, boomT);
+    gain.gain.exponentialRampToValueAtTime(0.001, boomT+0.55);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(boomT); osc.stop(boomT+0.56);
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer(ctx, 0.4, 1.0);
+    const ng = ctx.createGain(); ng.gain.value = 0.55;
+    noise.connect(ng).connect(ctx.destination);
+    noise.start(boomT);
   }
 
   // 비명: 브라우저 내장 음성합성으로 실제 목소리를 재생하되(추가 네트워크 요청 없음),
@@ -1434,6 +2039,48 @@
   };
   const TYPE_BURST_KEY = { wet:'burstWet', gross:'burstGross', musical:'burstMusical', party:'burstParty', extinguish:'burstHiss', gust:'burstGust' };
 
+  /* ---------------- 진행도 저장 + 무기 잠금해제 ---------------- */
+  const PROGRESS_KEY = 'stressSmashProgress_v1';
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      if(raw){
+        const p = JSON.parse(raw);
+        return { gamesPlayed:p.gamesPlayed||0, totalHits:p.totalHits||0, bestCombo:p.bestCombo||0 };
+      }
+    }catch(e){ /* localStorage unavailable — just play unlocked-from-scratch */ }
+    return { gamesPlayed:0, totalHits:0, bestCombo:0 };
+  }
+  function saveProgress(){
+    try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){ /* ignore */ }
+  }
+  let progress = loadProgress();
+  let lastResultData = null;
+
+  const STARTER_WEAPONS = ['fist','hammer','cushion','papers','keyboard'];
+  const UNLOCK_RULES = {
+    chicken: p=>p.gamesPlayed>=1,
+    slipper: p=>p.gamesPlayed>=1,
+    pan: p=>p.gamesPlayed>=3,
+    books: p=>p.gamesPlayed>=3,
+    broom: p=>p.gamesPlayed>=3,
+    glove: p=>p.bestCombo>=15,
+    toiletpaper: p=>p.bestCombo>=15,
+    waterballoon: p=>p.gamesPlayed>=5,
+    fish: p=>p.gamesPlayed>=5,
+    confetti: p=>p.bestCombo>=25,
+    extinguisher: p=>p.bestCombo>=25,
+    fan: p=>p.totalHits>=100,
+    fart: p=>p.gamesPlayed>=8,
+    sock: p=>p.gamesPlayed>=8,
+    sax: p=>p.bestCombo>=40,
+  };
+  function isWeaponUnlocked(key){
+    if(STARTER_WEAPONS.includes(key)) return true;
+    const rule = UNLOCK_RULES[key];
+    return rule ? rule(progress) : true;
+  }
+
   let selectedWeaponKey = 'random';
   function renderWeaponBar(){
     weaponBar.innerHTML = '';
@@ -1445,11 +2092,14 @@
     weaponBar.appendChild(randomBtn);
 
     WEAPON_DEFS.forEach(w=>{
+      const unlocked = isWeaponUnlocked(w.key);
       const btn = document.createElement('button');
-      btn.className = 'weaponBtn' + (selectedWeaponKey===w.key ? ' selected' : '');
+      btn.className = 'weaponBtn' + (selectedWeaponKey===w.key ? ' selected' : '') + (unlocked ? '' : ' locked');
       btn.textContent = w.emoji;
-      btn.title = t('weapons')[w.key];
-      btn.addEventListener('click', ()=>{ selectedWeaponKey = w.key; renderWeaponBar(); });
+      btn.title = unlocked ? t('weapons')[w.key] : t('lockedHint');
+      if(unlocked){
+        btn.addEventListener('click', ()=>{ selectedWeaponKey = w.key; renderWeaponBar(); });
+      }
       weaponBar.appendChild(btn);
     });
   }
@@ -1467,11 +2117,34 @@
   let comboResetTimer = null;
   let bruiseNodes = [];
   let currentExprLevel = 0;
+  let ultimateGauge = 0;
+  let ultimateReady = false;
+  let hitsThisGame = 0;
+  let comboResetCount = 0;
+  let grossHitsThisGame = 0;
+
+  function resetUltimate(){
+    ultimateGauge = 0;
+    ultimateReady = false;
+    ultimateFill.style.width = '0%';
+    ultimateTrack.classList.remove('ready');
+  }
+  function addUltimateCharge(amount){
+    if(ultimateReady) return;
+    ultimateGauge = Math.min(100, ultimateGauge + amount);
+    ultimateFill.style.width = ultimateGauge + '%';
+    if(ultimateGauge >= 100){
+      ultimateReady = true;
+      ultimateTrack.classList.add('ready');
+    }
+  }
 
   function resetGame(){
     stress = 100; combo = 0; maxCombo = 0; timeLeft = 30;
     weaponCount = {}; milestonesHit = new Set();
     currentExprLevel = 0;
+    hitsThisGame = 0; comboResetCount = 0; grossHitsThisGame = 0;
+    resetUltimate();
     gaugeFill.style.width = '100%';
     timeLeftEl.textContent = timeLeft;
     comboLabel.textContent = 'COMBO 0';
@@ -1494,6 +2167,8 @@
   beginBtn.addEventListener('click', () => {
     ensureAudio();
     targetName.textContent = enteredName || t('emptyNameFallback');
+    if(selectedWeaponKey !== 'random' && !isWeaponUnlocked(selectedWeaponKey)) selectedWeaponKey = 'random';
+    renderWeaponBar();
     resetGame();
     showScreen(gameScreen);
     running = true;
@@ -1551,6 +2226,21 @@
     for(const key in weaponCount){
       if(weaponCount[key] > topCount){ topCount = weaponCount[key]; topWeaponKey = key; }
     }
+    const uniqueWeapons = Object.keys(weaponCount).length;
+
+    // 진행도 저장 (무기 잠금해제용)
+    progress.gamesPlayed += 1;
+    progress.totalHits += hitsThisGame;
+    progress.bestCombo = Math.max(progress.bestCombo, maxCombo);
+    saveProgress();
+
+    // 플레이 스타일 기반 칭호 계산
+    let styleTitleKey = null;
+    if(uniqueWeapons === 1 && hitsThisGame >= 10) styleTitleKey = 'oneTrack';
+    else if(grossHitsThisGame >= 8) styleTitleKey = 'terrorist';
+    else if(uniqueWeapons >= 10) styleTitleKey = 'collector';
+    else if(comboResetCount === 0 && maxCombo >= 15) styleTitleKey = 'coolHead';
+    else if(comboResetCount >= 5) styleTitleKey = 'impatient';
 
     function reveal(){
       finishOverlay.classList.remove('show');
@@ -1568,6 +2258,22 @@
       document.getElementById('calmResult').textContent = '+' + calmGain;
       document.getElementById('comboResult').textContent = maxCombo;
       document.getElementById('weaponResult').textContent = topWeaponKey ? t('weapons')[topWeaponKey] : '-';
+
+      if(styleTitleKey){
+        styleTitleBadge.textContent = t('styleTitles')[styleTitleKey];
+        styleTitleBadge.style.display = 'inline-block';
+      } else {
+        styleTitleBadge.style.display = 'none';
+      }
+
+      lastResultData = {
+        name: targetName.textContent,
+        headline: t('headlines')[headlineKey],
+        styleTitle: styleTitleKey ? t('styleTitles')[styleTitleKey] : null,
+        stressDrop, calmGain, maxCombo,
+        topWeapon: topWeaponKey ? t('weapons')[topWeaponKey] : '-'
+      };
+
       showScreen(resultScreen);
     }
 
@@ -1592,6 +2298,133 @@
     nameInput.value = '';
     reasonInput.value = '';
     nameInput.focus();
+  });
+
+  // 결과 이미지 생성 (캔버스로 카드 그려서 다운로드 또는 공유)
+  function generateResultImageBlob(){
+    return new Promise((resolve)=>{
+      const data = lastResultData;
+      if(!data){ resolve(null); return; }
+      const W = 800, H = 1000;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      const draw = ()=>{
+        // background
+        ctx.fillStyle = '#fff6e8';
+        ctx.fillRect(0,0,W,H);
+        ctx.fillStyle = 'rgba(21,19,22,0.08)';
+        for(let y=20; y<H; y+=32){
+          for(let x=20; x<W; x+=32){
+            ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fill();
+          }
+        }
+
+        // badge
+        ctx.save();
+        ctx.translate(W/2, 70); ctx.rotate(-4*Math.PI/180);
+        ctx.fillStyle = '#ffd400';
+        roundRect(ctx, -110, -26, 220, 52, 26); ctx.fill();
+        ctx.lineWidth = 5; ctx.strokeStyle = '#151316'; roundRect(ctx, -110, -26, 220, 52, 26); ctx.stroke();
+        ctx.fillStyle = '#151316';
+        ctx.font = '700 26px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('RESULT', 0, 2);
+        ctx.restore();
+
+        // title / headline
+        ctx.fillStyle = '#777';
+        ctx.font = '400 22px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(data.name + ' 처단 완료', W/2, 150);
+        ctx.fillStyle = '#151316';
+        ctx.font = '700 40px sans-serif';
+        ctx.fillText(data.headline, W/2, 200);
+
+        if(data.styleTitle){
+          ctx.save();
+          ctx.translate(W/2, 250);
+          ctx.fillStyle = '#8b5cf6';
+          roundRect(ctx, -110, -22, 220, 44, 22); ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = '700 20px sans-serif';
+          ctx.fillText('칭호: ' + data.styleTitle, 0, 2);
+          ctx.restore();
+        }
+
+        // card
+        const cardTop = 320, cardH = 320;
+        ctx.fillStyle = '#fff';
+        roundRect(ctx, 90, cardTop, W-180, cardH, 24); ctx.fill();
+        ctx.lineWidth = 5; ctx.strokeStyle = '#151316';
+        roundRect(ctx, 90, cardTop, W-180, cardH, 24); ctx.stroke();
+
+        const rows = [
+          ['스트레스', '-'+data.stressDrop, '#ff2f6e'],
+          ['평정심', '+'+data.calmGain, '#1fa463'],
+          ['최대 콤보', String(data.maxCombo), '#2b7fd1'],
+          ['가장 많이 쓴 무기', data.topWeapon, '#151316'],
+        ];
+        let ry = cardTop + 60;
+        rows.forEach(([label, val, color])=>{
+          ctx.textAlign = 'left'; ctx.fillStyle = '#444';
+          ctx.font = '400 24px sans-serif';
+          ctx.fillText(label, 130, ry);
+          ctx.textAlign = 'right'; ctx.fillStyle = color;
+          ctx.font = '700 26px sans-serif';
+          ctx.fillText(val, W-130, ry);
+          ry += 68;
+        });
+
+        // footer branding
+        ctx.textAlign = 'center'; ctx.fillStyle = '#151316';
+        ctx.font = '700 26px sans-serif';
+        ctx.fillText('STRESS SMASH', W/2, H-60);
+
+        canvas.toBlob((blob)=> resolve(blob), 'image/png');
+      };
+
+      if(document.fonts && document.fonts.load){
+        Promise.all([
+          document.fonts.load('700 40px Jua'),
+          document.fonts.load('400 22px Jua')
+        ]).catch(()=>{}).then(draw);
+      } else {
+        draw();
+      }
+    });
+  }
+
+  function roundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+
+  shareBtn.addEventListener('click', async ()=>{
+    const originalText = shareBtn.textContent;
+    shareBtn.textContent = '...';
+    shareBtn.disabled = true;
+    try{
+      const blob = await generateResultImageBlob();
+      if(!blob){ shareBtn.textContent = originalText; shareBtn.disabled = false; return; }
+
+      const file = new File([blob], 'stress-smash-result.png', { type: 'image/png' });
+      if(navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({ files:[file], title:'Stress Smash' });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'stress-smash-result.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=> URL.revokeObjectURL(url), 2000);
+      }
+    }catch(e){ /* user cancelled share, or blocked — ignore */ }
+    shareBtn.textContent = originalText;
+    shareBtn.disabled = false;
   });
 
   function spawnFx(x, y, weaponKey, intensity){
@@ -1734,6 +2567,113 @@
     // been removed. The popup banner + sound alone are enough of a beat.
   }
 
+  function showCritText(){
+    const el = document.createElement('div');
+    el.className = 'critText';
+    el.textContent = t('critText');
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.fontSize = '30px';
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-50%) scale(1.1) rotate(-4deg)';
+    });
+    setTimeout(()=>{ el.style.opacity='0'; }, 400);
+    setTimeout(()=> el.remove(), 650);
+  }
+
+  // stress/표정/붕대/기절/게임종료 판정 등, 일반 타격과 필살기 타격이 공유하는 후처리
+  function applyDamageCommon(dmg){
+    stress = Math.max(0, stress - dmg);
+    gaugeFill.style.width = stress + '%';
+    updateExpression();
+    if(stress < 75) patches[0].style.opacity = 1;
+    if(stress < 55) patches[2].style.opacity = 1;
+    if(stress < 35) patches[1].style.opacity = 1;
+    if(stress < 20) patches[3].style.opacity = 1;
+    if(stress < 10) patches[4].style.opacity = 1;
+    if(stress <= 15){ dummy.classList.add('dizzy'); orbit.style.opacity = 1; }
+    if(stress <= 0){ endGame(true); }
+  }
+
+  function triggerUltimate(x, y){
+    resetUltimate();
+    combo++;
+    if(combo > maxCombo) maxCombo = combo;
+    comboLabel.textContent = 'COMBO ' + combo;
+    comboLabel.classList.add('show');
+    clearTimeout(comboResetTimer);
+    comboResetTimer = setTimeout(()=>{
+      if(combo > 0) comboResetCount++;
+      combo = 0;
+      comboLabel.classList.remove('show');
+    }, 900);
+
+    playUltimateSound();
+    screenFlash(0.6);
+    document.body.classList.add('screenshake');
+    setTimeout(()=> document.body.classList.remove('screenshake'), 320);
+
+    dummy.classList.remove('shake','shake-hard','flyback','squash','gust','ultimateZoom');
+    void dummy.offsetWidth;
+    dummy.classList.add('ultimateZoom');
+
+    const el = document.createElement('div');
+    el.className = 'ultimateText';
+    el.textContent = t('ultimateHitText');
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.fontSize = '40px';
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-50%) scale(1.15) rotate(-4deg)';
+    });
+    setTimeout(()=>{ el.style.opacity='0'; }, 700);
+    setTimeout(()=> el.remove(), 1000);
+
+    // big debris burst for extra spectacle
+    const debrisPool = ['⭐','💥','✨','💫','🎇'];
+    for(let i=0;i<14;i++){
+      const d = document.createElement('div');
+      d.className = 'debris';
+      d.textContent = debrisPool[Math.floor(Math.random()*debrisPool.length)];
+      d.style.left = x + 'px'; d.style.top = y + 'px';
+      d.style.fontSize = '26px';
+      d.style.transition = 'transform .6s ease-out, opacity .6s ease-out';
+      arena.appendChild(d);
+      const angle = Math.random()*Math.PI*2;
+      const dist = 70 + Math.random()*90;
+      requestAnimationFrame(()=>{
+        d.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist - 30}px) rotate(${Math.random()*360}deg)`;
+        d.style.opacity = '0';
+      });
+      setTimeout(()=> d.remove(), 650);
+    }
+
+    hitsThisGame++;
+    applyDamageCommon(38 + Math.floor(Math.random()*10));
+  }
+
+  // 능글맞은 조롱 대사 (애원/공포 대사와 달리 뻔뻔하고 코믹한 톤)
+  let lastTauntTime = 0;
+  function maybeShowTaunt(){
+    const now = performance.now();
+    if(now - lastTauntTime < 1600) return;
+    if(Math.random() > 0.22) return;
+    lastTauntTime = now;
+
+    const lines = t('taunts');
+    const line = lines[Math.floor(Math.random()*lines.length)];
+    const el = document.createElement('div');
+    el.className = 'tauntBubble';
+    el.textContent = line;
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-50%) scale(1) rotate(-4deg)';
+    });
+    setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translate(-50%,-50%) scale(0.8) rotate(-4deg)'; }, 1200);
+    setTimeout(()=> el.remove(), 1500);
+  }
+
   arena.addEventListener('pointerdown', (e) => {
     if(!running) return;
 
@@ -1741,60 +2681,60 @@
     const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
     const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
 
+    if(ultimateReady){
+      triggerUltimate(x, y);
+      return;
+    }
+
     combo++;
     if(combo > maxCombo) maxCombo = combo;
     comboLabel.textContent = 'COMBO ' + combo;
     comboLabel.classList.add('show');
     clearTimeout(comboResetTimer);
     comboResetTimer = setTimeout(()=>{
+      if(combo > 0) comboResetCount++;
       combo = 0;
       comboLabel.classList.remove('show');
     }, 900);
 
     const intensity = combo >= 20 ? 2 : (combo >= 8 ? 1 : 0);
+    const isCrit = Math.random() < 0.1;
 
     const weaponKey = selectedWeaponKey === 'random'
       ? WEAPON_DEFS[Math.floor(Math.random()*WEAPON_DEFS.length)].key
       : selectedWeaponKey;
     const weaponType = WEAPON_MAP[weaponKey].type;
     weaponCount[weaponKey] = (weaponCount[weaponKey] || 0) + 1;
+    hitsThisGame++;
+    if(weaponType === 'gross') grossHitsThisGame++;
+
     spawnFx(x, y, weaponKey, intensity);
     spawnBruise(e.clientX ?? (rect.left+rect.width/2), e.clientY ?? (rect.top+rect.height/2), intensity);
-    playHitSound(weaponType, intensity);
+    playHitSound(weaponKey, weaponType, intensity);
+    if(isCrit) playCritSound();
     playYelp(intensity);
     showMilestone(combo);
+    maybeShowTaunt();
 
-    const dmg = 2 + Math.min(8, Math.floor(combo/3)) + intensity*2;
-    stress = Math.max(0, stress - dmg);
-    gaugeFill.style.width = stress + '%';
-    updateExpression();
+    let dmg = 2 + Math.min(8, Math.floor(combo/3)) + intensity*2;
+    if(isCrit) dmg *= 2;
 
-    dummy.classList.remove('shake','shake-hard','flyback','squash','gust');
+    dummy.classList.remove('shake','shake-hard','flyback','squash','gust','critZoom');
     void dummy.offsetWidth;
-    if(weaponType === 'gust'){ dummy.classList.add('gust'); }
+    if(isCrit){ dummy.classList.add('critZoom'); showCritText(); }
+    else if(weaponType === 'gust'){ dummy.classList.add('gust'); }
     else if(intensity === 2){ dummy.classList.add('shake-hard'); }
     else if(combo % 2 === 0){ dummy.classList.add('flyback'); }
     else { dummy.classList.add('squash'); }
 
-    // NOTE: a full-screen flash used to fire every 5th combo hit here.
-    // On rapid taps that made the whole screen strobe white repeatedly,
-    // which read as flicker/blackout — removed. Flash is now reserved
-    // for milestones and the KO finisher only, where it's a one-off beat.
-
-    if(stress < 75) patches[0].style.opacity = 1;
-    if(stress < 55) patches[2].style.opacity = 1;
-    if(stress < 35) patches[1].style.opacity = 1;
-    if(stress < 20) patches[3].style.opacity = 1;
-    if(stress < 10) patches[4].style.opacity = 1;
-
-    if(stress <= 15){ dummy.classList.add('dizzy'); orbit.style.opacity = 1; }
+    addUltimateCharge(isCrit ? 18 : 10);
 
     if(combo % 6 === 0){
       document.body.classList.add('shake');
       setTimeout(()=> document.body.classList.remove('shake'), 280);
     }
 
-    if(stress <= 0){ endGame(true); }
+    applyDamageCommon(dmg);
   });
 
   applyI18n();
