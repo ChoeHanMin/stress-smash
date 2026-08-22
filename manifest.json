@@ -1,0 +1,32 @@
+{
+  "name": "Stress Smash",
+  "short_name": "Stress Smash",
+  "description": "짜증나는 사람 이름 넣고 샌드백 캐릭터를 두들겨 패며 스트레스를 푸는 병맛 게임",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff6e8",
+  "theme_color": "#ff2f6e",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
