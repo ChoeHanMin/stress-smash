@@ -189,6 +189,45 @@
     opacity:0; transform:scale(0.6); transition:opacity .1s, transform .1s;
   }
   #comboLabel.show{ opacity:1; transform:scale(1); }
+
+  .comboRank{
+    font-family:'Jua',sans-serif; font-size:16px; font-weight:400;
+    padding:2px 9px; border-radius:8px; border:3px solid var(--ink);
+    opacity:0; transform:scale(0.5); transition:opacity .12s ease, transform .12s ease;
+    background:#fff;
+  }
+  .comboRank.show{ opacity:1; transform:scale(1); }
+  .comboRank.rank-c{ color:#666; background:#eee; }
+  .comboRank.rank-b{ color:#fff; background:#3ec6ff; }
+  .comboRank.rank-a{ color:#fff; background:#3ddc84; }
+  .comboRank.rank-s{ color:#fff; background:#8b5cf6; }
+  .comboRank.rank-ss{ color:#fff; background:#ff2f6e; }
+  .comboRank.rank-sss{
+    color:var(--ink); background:var(--yellow);
+    animation: rankGlow .5s ease-in-out infinite alternate;
+  }
+  @keyframes rankGlow{
+    from{ box-shadow:0 0 0 0 rgba(255,212,0,0.7); }
+    to{ box-shadow:0 0 0 6px rgba(255,212,0,0); }
+  }
+
+  .powerup{
+    position:absolute; width:42px; height:42px; border-radius:50%;
+    background:#fff; border:4px solid var(--ink); box-shadow:3px 3px 0 var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    cursor:pointer; z-index:12; transform:translate(-50%,-50%) scale(1);
+    animation: powerupPulse .5s ease-in-out infinite alternate;
+  }
+  @keyframes powerupPulse{
+    from{ transform:translate(-50%,-50%) scale(1); }
+    to{ transform:translate(-50%,-50%) scale(1.15); }
+  }
+  .powerupFloat{
+    position:absolute; font-family:'Jua',sans-serif; font-size:0px;
+    color:var(--green); -webkit-text-stroke:2.5px var(--ink); pointer-events:none;
+    z-index:13; white-space:nowrap; transform:translate(-50%,-50%) scale(0.3);
+    opacity:0; transition:font-size .2s ease, transform .35s ease, opacity .35s ease;
+  }
   .gauge-wrap{ width:100%; text-align:left; }
   .gauge-label{ font-size:13px; margin-bottom:3px; color:#444; }
   .gauge-track{
@@ -603,6 +642,15 @@
   <h1><span data-i18n="titleLine1">오늘</span><br><span data-i18n="titleLine2">어떤 새끼 때문에</span><br><span data-i18n="titleLine3">빡쳤나요?</span></h1>
   <input id="nameInput" type="text" maxlength="12" data-i18n-placeholder="namePlaceholder" placeholder="이름(or 별명)을 적어주세요">
   <button class="randomBtn" id="randomNameBtn" data-i18n="randomNameBtn">🎲 아무나 뽑아줘</button>
+
+  <div class="cust-row" style="width:min(320px,80vw); margin:0 0 18px;">
+    <span class="cust-label" data-i18n="difficultyLabel" style="justify-content:center; font-size:12px;">난이도</span>
+    <div class="genderRow" id="difficultyRow">
+      <button class="genderBtn selected" data-value="normal" data-i18n="difficultyNormal">기본</button>
+      <button class="genderBtn" data-value="hard" data-i18n="difficultyHard">하드</button>
+    </div>
+  </div>
+
   <button class="bigbtn" id="nextBtn" data-i18n="nextBtn">다음 →</button>
 </div>
 
@@ -824,6 +872,7 @@
       <span id="timeLeft">30</span>
       <button class="pillBtn" id="bgmToggle" style="font-size:16px; padding:2px 10px;">🔊</button>
       <span id="comboLabel">COMBO 0</span>
+      <span id="comboRank" class="comboRank"></span>
     </div>
     <div class="gauge-wrap">
       <div class="gauge-label" data-i18n="stressLabel">스트레스</div>
@@ -969,6 +1018,8 @@
       taunts:['안 아픈데?','응 어쩔','그게 다야?','간지러운데','더 세게 때려봐','느낌도 없다','약한데?','이 정도로 되겠어?'],
       ultimateLabel:'필살기',
       randomNameBtn:'🎲 아무나 뽑아줘',
+      difficultyLabel:'난이도', difficultyNormal:'기본', difficultyHard:'하드',
+      powerupTimeUnit:'초', powerupUltimateText:'⚡ 필살기 충전!',
       randomNamePresets:['옆팀 김대리','단톡방 프사 안 바꾸는 애','발표 5분 전에 자료 바꾸는 팀장','택배 상하차 시키는 사장님','지하철에서 이어폰 안 낀 사람','카톡 3일째 읽씹인 친구','내 앞에서 새치기한 사람','알람 5번 미루고 나만 깨우는 룸메','회의 끝나고 다시 잡자는 사람','내 아이디어 자기 것처럼 말하는 동료'],
       shareBtn:'📸 결과 이미지 저장',
       lockedHint:'아직 잠겨있어요',
@@ -1039,6 +1090,8 @@
       taunts:["Didn't feel a thing","So what?","Is that all you got?","That tickles","Hit harder","Nothing happened","Weak.","You call that a hit?"],
       ultimateLabel:'Ultimate',
       randomNameBtn:'🎲 Pick someone for me',
+      difficultyLabel:'Difficulty', difficultyNormal:'Normal', difficultyHard:'Hard',
+      powerupTimeUnit:'s', powerupUltimateText:'⚡ Ultimate charged!',
       randomNamePresets:['That guy from marketing','My group chat\'s silent reader','The boss who "needs it by EOD"','My neighbor\'s car alarm','The line-cutter at the coffee shop','My roommate who never does dishes','The reply-all email guy','My landlord','The friend who left me on read for 3 days','The coworker who takes credit for my ideas'],
       shareBtn:'📸 Save result image',
       lockedHint:'Still locked',
@@ -1104,6 +1157,7 @@
   const gaugeFill = document.getElementById('gaugeFill');
   const timeLeftEl = document.getElementById('timeLeft');
   const comboLabel = document.getElementById('comboLabel');
+  const comboRank = document.getElementById('comboRank');
   const patches = document.querySelectorAll('#gm_torso > .patch');
   const orbit = document.getElementById('orbit');
   const flashEl = document.getElementById('flash');
@@ -1117,6 +1171,7 @@
 
   let enteredName = '';
   let enteredReason = '';
+  let difficulty = 'normal';
 
   const ALL_SCREENS = [startScreen, reasonScreen, customizeScreen, gameScreen, resultScreen];
   function resetScrollPosition(el){
@@ -1207,6 +1262,13 @@
   randomNameBtn.addEventListener('click', ()=>{
     const presets = t('randomNamePresets');
     nameInput.value = presets[Math.floor(Math.random()*presets.length)];
+  });
+  document.querySelectorAll('#difficultyRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#difficultyRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      difficulty = btn.getAttribute('data-value');
+    });
   });
 
   reasonNextBtn.addEventListener('click', ()=>{
@@ -1878,6 +1940,24 @@
     });
   }
 
+  function playPowerupSound(){
+    if(!audioCtx) return;
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    [880, 1174.7].forEach((freq, i)=>{
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const gain = ctx.createGain();
+      const t0 = now + i*0.06;
+      gain.gain.setValueAtTime(0.001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.32, t0+0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0+0.18);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0); osc.stop(t0+0.2);
+    });
+  }
+
   function playKO(){
     if(!audioCtx) return;
     const ctx = audioCtx;
@@ -2115,6 +2195,7 @@
   let running = false;
   let weaponCount = {};
   let comboResetTimer = null;
+  let comboDecayMs = 900;
   let bruiseNodes = [];
   let currentExprLevel = 0;
   let ultimateGauge = 0;
@@ -2122,6 +2203,8 @@
   let hitsThisGame = 0;
   let comboResetCount = 0;
   let grossHitsThisGame = 0;
+  let powerupTimer = null;
+  let activePowerup = null;
 
   function resetUltimate(){
     ultimateGauge = 0;
@@ -2139,8 +2222,25 @@
     }
   }
 
+  // 콤보 수에 따른 실시간 랭크 표시 (D~SSS)
+  function updateComboRank(){
+    let rank = null;
+    if(combo >= 50) rank = 'SSS';
+    else if(combo >= 35) rank = 'SS';
+    else if(combo >= 25) rank = 'S';
+    else if(combo >= 15) rank = 'A';
+    else if(combo >= 10) rank = 'B';
+    else if(combo >= 5) rank = 'C';
+    comboRank.classList.remove('rank-c','rank-b','rank-a','rank-s','rank-ss','rank-sss','show');
+    if(rank){
+      comboRank.textContent = rank;
+      comboRank.classList.add('rank-' + rank.toLowerCase(), 'show');
+    }
+  }
+
   function resetGame(){
-    stress = 100; combo = 0; maxCombo = 0; timeLeft = 30;
+    comboDecayMs = difficulty === 'hard' ? 650 : 900;
+    stress = 100; combo = 0; maxCombo = 0; timeLeft = difficulty === 'hard' ? 20 : 30;
     weaponCount = {}; milestonesHit = new Set();
     currentExprLevel = 0;
     hitsThisGame = 0; comboResetCount = 0; grossHitsThisGame = 0;
@@ -2149,6 +2249,7 @@
     timeLeftEl.textContent = timeLeft;
     comboLabel.textContent = 'COMBO 0';
     comboLabel.classList.remove('show');
+    comboRank.classList.remove('rank-c','rank-b','rank-a','rank-s','rank-ss','rank-sss','show');
     dummy.classList.remove('dizzy');
     dummy.style.transition = 'none';
     dummy.style.transform = '';
@@ -2162,6 +2263,8 @@
     finishText.textContent = '';
     signBoard.textContent = '"' + (enteredReason || t('reasonDefault')) + '"';
     if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if(activePowerup){ activePowerup.remove(); activePowerup = null; }
+    clearTimeout(powerupTimer);
   }
 
   beginBtn.addEventListener('click', () => {
@@ -2174,6 +2277,7 @@
     running = true;
     startTimer();
     startBGM();
+    schedulePowerup();
   });
 
   function startTimer(){
@@ -2194,6 +2298,7 @@
         wasRunningBeforeHidden = true;
         clearInterval(timerId);
         stopBGM();
+        clearTimeout(powerupTimer);
         if(audioCtx) audioCtx.suspend();
       }
     } else {
@@ -2202,6 +2307,7 @@
         if(audioCtx) audioCtx.resume();
         startTimer();
         startBGM();
+        schedulePowerup();
       }
     }
   });
@@ -2219,6 +2325,8 @@
     running = false;
     clearInterval(timerId);
     stopBGM();
+    clearTimeout(powerupTimer);
+    if(activePowerup){ activePowerup.remove(); activePowerup = null; }
     const stressDrop = 100 - stress;
     const calmGain = Math.round(stressDrop * 0.4 + maxCombo * 1.5);
     let topWeaponKey = null;
@@ -2595,18 +2703,103 @@
     if(stress <= 0){ endGame(true); }
   }
 
+  /* ---------------- 파워업 아이템: 짧게 나타났다 사라지는 보너스 아이콘 ---------------- */
+  const POWERUP_TYPES = [
+    { key:'time', emoji:'⏱️' },
+    { key:'ultimate', emoji:'⚡' },
+    { key:'bighit', emoji:'💥' },
+  ];
+
+  function schedulePowerup(){
+    clearTimeout(powerupTimer);
+    if(!running) return;
+    const baseDelay = difficulty === 'hard' ? 8500 : 6500;
+    const delay = baseDelay + Math.random() * 4000;
+    powerupTimer = setTimeout(()=>{
+      if(running && !activePowerup) spawnPowerup();
+      schedulePowerup();
+    }, delay);
+  }
+
+  function spawnPowerup(){
+    if(!running || activePowerup) return;
+    const type = POWERUP_TYPES[Math.floor(Math.random()*POWERUP_TYPES.length)];
+    const el = document.createElement('div');
+    el.className = 'powerup';
+    el.textContent = type.emoji;
+    const x = 20 + Math.random()*60;
+    const y = 15 + Math.random()*55;
+    el.style.left = x + '%';
+    el.style.top = y + '%';
+    arena.appendChild(el);
+    activePowerup = el;
+
+    let collected = false;
+    const expireTimer = setTimeout(()=>{
+      if(!collected && activePowerup === el){
+        el.style.transition = 'opacity .2s ease, transform .2s ease';
+        el.style.opacity = '0';
+        setTimeout(()=> el.remove(), 220);
+        activePowerup = null;
+      }
+    }, 2300);
+
+    el.addEventListener('pointerdown', (e)=>{
+      e.stopPropagation();
+      if(collected) return;
+      collected = true;
+      clearTimeout(expireTimer);
+      applyPowerupEffect(type.key, x, y);
+      el.remove();
+      activePowerup = null;
+    });
+  }
+
+  function spawnPowerupFloatText(text, x, y){
+    const el = document.createElement('div');
+    el.className = 'powerupFloat';
+    el.textContent = text;
+    el.style.left = x + '%';
+    el.style.top = y + '%';
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.fontSize = '24px';
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-140%) scale(1)';
+    });
+    setTimeout(()=>{ el.style.opacity = '0'; }, 500);
+    setTimeout(()=> el.remove(), 750);
+  }
+
+  function applyPowerupEffect(key, x, y){
+    playPowerupSound();
+    if(key === 'time'){
+      timeLeft += 5;
+      timeLeftEl.textContent = timeLeft;
+      spawnPowerupFloatText('+5' + t('powerupTimeUnit'), x, y);
+    } else if(key === 'ultimate'){
+      addUltimateCharge(100);
+      spawnPowerupFloatText(t('powerupUltimateText'), x, y);
+    } else if(key === 'bighit'){
+      spawnPowerupFloatText('-20!', x, y);
+      applyDamageCommon(20);
+    }
+  }
+
   function triggerUltimate(x, y){
     resetUltimate();
     combo++;
     if(combo > maxCombo) maxCombo = combo;
     comboLabel.textContent = 'COMBO ' + combo;
     comboLabel.classList.add('show');
+    updateComboRank();
     clearTimeout(comboResetTimer);
     comboResetTimer = setTimeout(()=>{
       if(combo > 0) comboResetCount++;
       combo = 0;
       comboLabel.classList.remove('show');
-    }, 900);
+      updateComboRank();
+    }, comboDecayMs);
 
     playUltimateSound();
     screenFlash(0.6);
@@ -2690,12 +2883,14 @@
     if(combo > maxCombo) maxCombo = combo;
     comboLabel.textContent = 'COMBO ' + combo;
     comboLabel.classList.add('show');
+    updateComboRank();
     clearTimeout(comboResetTimer);
     comboResetTimer = setTimeout(()=>{
       if(combo > 0) comboResetCount++;
       combo = 0;
       comboLabel.classList.remove('show');
-    }, 900);
+      updateComboRank();
+    }, comboDecayMs);
 
     const intensity = combo >= 20 ? 2 : (combo >= 8 ? 1 : 0);
     const isCrit = Math.random() < 0.1;
