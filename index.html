@@ -106,6 +106,38 @@
   }
   .randomBtn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
 
+  .rivalBanner{
+    background:#fff; border:4px solid var(--hotpink); border-radius:14px;
+    padding:10px 16px; margin-bottom:16px; font-family:'Jua',sans-serif;
+    font-size:13px; color:var(--ink); box-shadow:3px 3px 0 var(--ink);
+    max-width:300px; word-break:keep-all;
+  }
+  .rivalBanner b{ color:var(--hotpink); }
+
+  .turnBanner{
+    font-family:'Jua',sans-serif; font-size:13px; color:#fff;
+    background:var(--purple); border:3px solid var(--ink); border-radius:10px;
+    padding:4px 14px; margin:4px 0; box-shadow:2px 2px 0 var(--ink);
+    animation: turnPop .3s ease-out;
+  }
+  @keyframes turnPop{ from{ transform:scale(0.7); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+  .storyStageIndicator{
+    font-family:'Jua',sans-serif; font-size:12px; color:var(--ink);
+    background:var(--sky); border:3px solid var(--ink); border-radius:10px;
+    padding:3px 12px; margin-bottom:6px; box-shadow:2px 2px 0 var(--ink);
+  }
+
+  .bossWarning{
+    position:absolute; top:-6%; left:50%; transform:translateX(-50%);
+    font-family:'Jua',sans-serif; font-size:15px; color:#fff;
+    background:var(--hotpink); border:3px solid var(--ink); border-radius:10px;
+    padding:5px 14px; white-space:nowrap; z-index:20;
+    box-shadow:2px 2px 0 var(--ink);
+    animation: bossWarnBlink .35s ease-in-out infinite alternate;
+  }
+  @keyframes bossWarnBlink{ from{ opacity:1; } to{ opacity:0.4; } }
+
   /* ---------- REASON SCREEN ---------- */
   #reason{ justify-content:center; }
 
@@ -271,6 +303,10 @@
   .weaponBtn.locked::after{
     content:"🔒"; position:absolute; bottom:-4px; right:-4px; font-size:11px;
   }
+  .weaponBtn.seasonal{ border-color:var(--hotpink); }
+  .weaponBtn.seasonal::before{
+    content:"✨"; position:absolute; top:-6px; left:-6px; font-size:11px;
+  }
 
   .styleTitleBadge{
     background:var(--purple) !important; color:#fff; margin-top:-8px; margin-bottom:10px;
@@ -279,6 +315,17 @@
   .arena{
     position:relative; width:min(320px,78vw); height:min(340px,80vw);
     margin-top:14px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    border-radius:24px; transition:background .25s ease, box-shadow .25s ease;
+  }
+  .arena.combo-tier-1{ background:radial-gradient(circle, rgba(255,212,0,0.18), transparent 70%); }
+  .arena.combo-tier-2{ background:radial-gradient(circle, rgba(255,47,110,0.22), transparent 70%); }
+  .arena.combo-tier-3{
+    background:radial-gradient(circle, rgba(139,92,246,0.28), transparent 70%);
+    animation: arenaPulse 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes arenaPulse{
+    from{ box-shadow:0 0 0 0 rgba(139,92,246,0.35); }
+    to{ box-shadow:0 0 0 14px rgba(139,92,246,0); }
   }
   .dummy{ width:74%; height:82%; position:relative; transform-origin:center bottom; }
 
@@ -639,9 +686,22 @@
     <button class="pillBtn" id="langBtn">English</button>
   </div>
   <div class="badge" data-i18n="badge">STRESS SMASH</div>
+  <div id="rivalBanner" class="rivalBanner" style="display:none;"></div>
   <h1><span data-i18n="titleLine1">오늘</span><br><span data-i18n="titleLine2">어떤 새끼 때문에</span><br><span data-i18n="titleLine3">빡쳤나요?</span></h1>
   <input id="nameInput" type="text" maxlength="12" data-i18n-placeholder="namePlaceholder" placeholder="이름(or 별명)을 적어주세요">
   <button class="randomBtn" id="randomNameBtn" data-i18n="randomNameBtn">🎲 아무나 뽑아줘</button>
+
+  <div class="cust-row" style="width:min(320px,80vw); margin:0 0 14px;">
+    <span class="cust-label" data-i18n="modeLabel" style="justify-content:center; font-size:12px;">게임 모드</span>
+    <div class="genderRow" id="modeRow" style="flex-wrap:wrap;">
+      <button class="genderBtn selected" data-value="normal" data-i18n="modeNormal">기본</button>
+      <button class="genderBtn" data-value="coop" data-i18n="modeCoop">협동</button>
+      <button class="genderBtn" data-value="boss" data-i18n="modeBoss">보스전</button>
+      <button class="genderBtn" data-value="story" data-i18n="modeStory">스토리</button>
+    </div>
+  </div>
+
+  <input id="name2Input" type="text" maxlength="12" data-i18n-placeholder="name2Placeholder" placeholder="플레이어 2 이름" style="display:none;">
 
   <div class="cust-row" style="width:min(320px,80vw); margin:0 0 18px;">
     <span class="cust-label" data-i18n="difficultyLabel" style="justify-content:center; font-size:12px;">난이도</span>
@@ -884,11 +944,14 @@
     </div>
   </div>
 
+  <div id="storyStageIndicator" class="storyStageIndicator" style="display:none;"></div>
   <div id="targetName">이름</div>
+  <div id="turnBanner" class="turnBanner" style="display:none;"></div>
 
   <div class="weaponBar" id="weaponBar"></div>
 
   <div class="arena" id="arena">
+    <div id="bossWarning" class="bossWarning" style="display:none;"></div>
     <div class="dummy" id="dummy">
       <div class="bodyShape" id="gm_body"></div>
       <div class="neckShape" id="gm_neck"></div>
@@ -954,6 +1017,19 @@
   </div>
   <button class="bigbtn" id="retryBtn" data-i18n="retryBtn">한 판 더 패기</button>
   <button class="randomBtn" id="shareBtn" data-i18n="shareBtn">📸 결과 이미지 저장</button>
+  <button class="randomBtn" id="challengeBtn" data-i18n="challengeBtn">🔗 친구에게 도전장</button>
+</div>
+
+<!-- STORY END -->
+<div id="storyEnd" class="screen">
+  <div class="badge" data-i18n="storyClearBadge">STORY CLEAR</div>
+  <h2 data-i18n="storyClearTitle">오늘 하루, 완벽하게 청산했다 🎉</h2>
+  <div class="resultCard">
+    <div class="resultRow"><span data-i18n="storyStagesLabel">처단한 인원</span><b class="combo-max" id="storyStagesResult">3</b></div>
+    <div class="resultRow"><span data-i18n="calmLabel">평정심</span><b class="calm-up" id="storyCalmResult">+0</b></div>
+    <div class="resultRow"><span data-i18n="comboMaxLabel">최대 콤보</span><b class="combo-max" id="storyComboResult">0</b></div>
+  </div>
+  <button class="bigbtn" id="storyRetryBtn" data-i18n="retryBtn">한 판 더 패기</button>
 </div>
 
 <script>
@@ -1007,7 +1083,8 @@
         fist:'주먹', hammer:'뿅망치', cushion:'쿠션', papers:'서류뭉치', keyboard:'키보드', chicken:'고무닭',
         slipper:'대왕 슬리퍼', pan:'프라이팬', books:'전공책 더미', broom:'빗자루', waterballoon:'물풍선',
         confetti:'컨페티 캐논', extinguisher:'소화기', glove:'복싱글러브 발사기', fan:'부채',
-        fart:'방귀 폭탄', fish:'언 동태', sock:'냄새나는 양말', sax:'색소폰 (뿅!)', toiletpaper:'두루마리 휴지'
+        fart:'방귀 폭탄', fish:'언 동태', sock:'냄새나는 양말', sax:'색소폰 (뿅!)', toiletpaper:'두루마리 휴지',
+        santabat:'산타 방망이', pumpkin:'호박 랜턴', roses:'장미 다발', watergun:'물총'
       },
       randomLabel:'랜덤',
       burstLow:['퍽!','툭!','팡!','텅!'], burstMid:['빠악!','으적!','우당탕!','캬악!'], burstHigh:['박살!!','와지끈!!','뿌지직!!','뻐어어억!!'],
@@ -1019,7 +1096,21 @@
       ultimateLabel:'필살기',
       randomNameBtn:'🎲 아무나 뽑아줘',
       difficultyLabel:'난이도', difficultyNormal:'기본', difficultyHard:'하드',
+      modeLabel:'게임 모드', modeNormal:'기본', modeCoop:'협동', modeBoss:'보스전', modeStory:'스토리',
+      name2Placeholder:'플레이어 2 이름',
+      coopPlayer1Default:'플레이어 1', coopPlayer2Default:'플레이어 2',
+      turnBannerText:'🙌 {name} 차례!',
+      bossWarningText:'⚠️ 반격 온다!', bossCounterText:'👊 지금 탭!',
+      storyStageNames:['말 끊는 팀장','단톡방에 캡처 뿌리는 친구','주차 두 칸 쓰는 이웃'],
+      storyStageReasons:['회의마다 내 말을 끊음','몰래 캡처해서 소문냄','맨날 두 칸 걸쳐 주차함'],
+      storyStageProgress:'상대 {n}/{total}',
+      storyClearBadge:'STORY CLEAR',
+      storyClearTitle:'오늘 하루, 완벽하게 청산했다 🎉',
+      storyStagesLabel:'처단한 인원',
       powerupTimeUnit:'초', powerupUltimateText:'⚡ 필살기 충전!',
+      challengeBtn:'🔗 친구에게 도전장', challengeCopied:'링크 복사됨!',
+      challengeShareText:'{name}를 콤보 {combo}로 처단했다! 너도 이겨봐 👊',
+      rivalBannerText:'<b>{name}</b>님의 기록: 콤보 {combo} / 스트레스 -{stress}. 이겨보자! 🔥',
       randomNamePresets:['옆팀 김대리','단톡방 프사 안 바꾸는 애','발표 5분 전에 자료 바꾸는 팀장','택배 상하차 시키는 사장님','지하철에서 이어폰 안 낀 사람','카톡 3일째 읽씹인 친구','내 앞에서 새치기한 사람','알람 5번 미루고 나만 깨우는 룸메','회의 끝나고 다시 잡자는 사람','내 아이디어 자기 것처럼 말하는 동료'],
       shareBtn:'📸 결과 이미지 저장',
       lockedHint:'아직 잠겨있어요',
@@ -1079,7 +1170,8 @@
         fist:'Fist', hammer:'Squeaky hammer', cushion:'Cushion', papers:'Paper stack', keyboard:'Keyboard', chicken:'Rubber chicken',
         slipper:'Giant slipper', pan:'Frying pan', books:'Textbook stack', broom:'Broom', waterballoon:'Water balloon',
         confetti:'Confetti cannon', extinguisher:'Fire extinguisher', glove:'Boxing glove launcher', fan:'Fan',
-        fart:'Fart bomb', fish:'Frozen fish', sock:'Stinky sock', sax:'Honking saxophone', toiletpaper:'Toilet paper roll'
+        fart:'Fart bomb', fish:'Frozen fish', sock:'Stinky sock', sax:'Honking saxophone', toiletpaper:'Toilet paper roll',
+        santabat:'Santa bat', pumpkin:'Jack-o-lantern', roses:'Bouquet of roses', watergun:'Water gun'
       },
       randomLabel:'Random',
       burstLow:['POW!','BONK!','THWAP!','BAM!'], burstMid:['SMACK!','CRUNCH!','WHUMP!','YOWCH!'], burstHigh:['CRUSHED!!','SPLAT!!','DEMOLISHED!!','OBLITERATED!!'],
@@ -1091,7 +1183,21 @@
       ultimateLabel:'Ultimate',
       randomNameBtn:'🎲 Pick someone for me',
       difficultyLabel:'Difficulty', difficultyNormal:'Normal', difficultyHard:'Hard',
+      modeLabel:'Game Mode', modeNormal:'Normal', modeCoop:'Co-op', modeBoss:'Boss', modeStory:'Story',
+      name2Placeholder:'Player 2 name',
+      coopPlayer1Default:'Player 1', coopPlayer2Default:'Player 2',
+      turnBannerText:"🙌 {name}'s turn!",
+      bossWarningText:'⚠️ Counter incoming!', bossCounterText:'👊 Tap now!',
+      storyStageNames:['The boss who cuts you off','The friend who screenshots the group chat','The neighbor who parks across two spots'],
+      storyStageReasons:['Interrupts me every meeting','Screenshots and spreads gossip','Always takes up two parking spots'],
+      storyStageProgress:'Opponent {n}/{total}',
+      storyClearBadge:'STORY CLEAR',
+      storyClearTitle:"Today's grudges? Fully settled 🎉",
+      storyStagesLabel:'Opponents defeated',
       powerupTimeUnit:'s', powerupUltimateText:'⚡ Ultimate charged!',
+      challengeBtn:'🔗 Challenge a friend', challengeCopied:'Link copied!',
+      challengeShareText:'I smashed {name} with a {combo} combo! Beat that 👊',
+      rivalBannerText:"<b>{name}</b>'s record: {combo} combo / -{stress} stress. Beat it! 🔥",
       randomNamePresets:['That guy from marketing','My group chat\'s silent reader','The boss who "needs it by EOD"','My neighbor\'s car alarm','The line-cutter at the coffee shop','My roommate who never does dishes','The reply-all email guy','My landlord','The friend who left me on read for 3 days','The coworker who takes credit for my ideas'],
       shareBtn:'📸 Save result image',
       lockedHint:'Still locked',
@@ -1147,6 +1253,14 @@
   const beginBtn = document.getElementById('beginBtn');
   const retryBtn = document.getElementById('retryBtn');
   const shareBtn = document.getElementById('shareBtn');
+  const challengeBtn = document.getElementById('challengeBtn');
+  const rivalBanner = document.getElementById('rivalBanner');
+  const name2Input = document.getElementById('name2Input');
+  const turnBanner = document.getElementById('turnBanner');
+  const bossWarning = document.getElementById('bossWarning');
+  const storyStageIndicator = document.getElementById('storyStageIndicator');
+  const storyEndScreen = document.getElementById('storyEnd');
+  const storyRetryBtn = document.getElementById('storyRetryBtn');
   const styleTitleBadge = document.getElementById('styleTitleBadge');
   const ultimateFill = document.getElementById('ultimateFill');
   const ultimateTrack = document.getElementById('ultimateTrack');
@@ -1172,8 +1286,22 @@
   let enteredName = '';
   let enteredReason = '';
   let difficulty = 'normal';
+  let gameMode = 'normal'; // normal | coop | boss | story
+  let enteredName2 = '';
+  let coopTurn = 1;
+  let coopHitsSinceSwitch = 0;
+  const COOP_SWITCH_EVERY = 5;
+  let bossEventTimer = null;
+  let bossCounterTimeout = null;
+  let bossCounterWindowActive = false;
+  let storyActive = false;
+  let storyStageIndex = 0;
+  let storyTotalCombo = 0;
+  let storyTotalStressDrop = 0;
+  let storyTotalCalm = 0;
+  const STORY_STAGE_COUNT = 3;
 
-  const ALL_SCREENS = [startScreen, reasonScreen, customizeScreen, gameScreen, resultScreen];
+  const ALL_SCREENS = [startScreen, reasonScreen, customizeScreen, gameScreen, resultScreen, storyEndScreen];
   function resetScrollPosition(el){
     window.scrollTo(0,0);
     document.documentElement.scrollTop = 0;
@@ -1255,6 +1383,7 @@
       return;
     }
     enteredName = val;
+    enteredName2 = name2Input.value.trim();
     nameInput.blur();
     afterKeyboardCloses(()=> showScreen(reasonScreen));
   });
@@ -1268,6 +1397,14 @@
       document.querySelectorAll('#difficultyRow .genderBtn').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       difficulty = btn.getAttribute('data-value');
+    });
+  });
+  document.querySelectorAll('#modeRow .genderBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#modeRow .genderBtn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      gameMode = btn.getAttribute('data-value');
+      name2Input.style.display = gameMode === 'coop' ? 'block' : 'none';
     });
   });
 
@@ -2103,9 +2240,27 @@
     {key:'fart', emoji:'💨', type:'gross'},
     {key:'sock', emoji:'🧦', type:'gross'},
     {key:'sax', emoji:'🎷', type:'musical'},
+    {key:'santabat', emoji:'🎅', type:'blunt', season:'dec'},
+    {key:'pumpkin', emoji:'🎃', type:'blunt', season:'oct'},
+    {key:'roses', emoji:'🌹', type:'blunt', season:'feb'},
+    {key:'watergun', emoji:'🔫', type:'wet', season:'summer'},
   ];
   const WEAPON_MAP = {};
   WEAPON_DEFS.forEach(w => WEAPON_MAP[w.key] = w);
+
+  // 시즌 한정 무기 판별 (실제 기기 날짜 기준)
+  function isInSeason(season){
+    if(!season) return true;
+    const m = new Date().getMonth() + 1; // 1~12
+    if(season === 'dec') return m === 12;
+    if(season === 'oct') return m === 10;
+    if(season === 'feb') return m === 2;
+    if(season === 'summer') return m >= 6 && m <= 8;
+    return true;
+  }
+  function activeWeaponDefs(){
+    return WEAPON_DEFS.filter(w => isInSeason(w.season));
+  }
 
   const TYPE_REACT_ICON = { wet:'😱', gross:'🤢', musical:'😵', party:'😲', extinguish:'😨', gust:'😮' };
   const TYPE_DEBRIS = {
@@ -2156,6 +2311,7 @@
     sax: p=>p.bestCombo>=40,
   };
   function isWeaponUnlocked(key){
+    if(WEAPON_MAP[key] && WEAPON_MAP[key].season) return true; // 시즌 무기는 잠금 없음
     if(STARTER_WEAPONS.includes(key)) return true;
     const rule = UNLOCK_RULES[key];
     return rule ? rule(progress) : true;
@@ -2171,10 +2327,10 @@
     randomBtn.addEventListener('click', ()=>{ selectedWeaponKey='random'; renderWeaponBar(); });
     weaponBar.appendChild(randomBtn);
 
-    WEAPON_DEFS.forEach(w=>{
+    activeWeaponDefs().forEach(w=>{
       const unlocked = isWeaponUnlocked(w.key);
       const btn = document.createElement('button');
-      btn.className = 'weaponBtn' + (selectedWeaponKey===w.key ? ' selected' : '') + (unlocked ? '' : ' locked');
+      btn.className = 'weaponBtn' + (selectedWeaponKey===w.key ? ' selected' : '') + (unlocked ? '' : ' locked') + (w.season ? ' seasonal' : '');
       btn.textContent = w.emoji;
       btn.title = unlocked ? t('weapons')[w.key] : t('lockedHint');
       if(unlocked){
@@ -2236,6 +2392,12 @@
       comboRank.textContent = rank;
       comboRank.classList.add('rank-' + rank.toLowerCase(), 'show');
     }
+
+    // 콤보 구간에 따라 아레나 배경이 점점 화려해짐
+    arena.classList.remove('combo-tier-1','combo-tier-2','combo-tier-3');
+    if(combo >= 25) arena.classList.add('combo-tier-3');
+    else if(combo >= 10) arena.classList.add('combo-tier-2');
+    else if(combo >= 5) arena.classList.add('combo-tier-1');
   }
 
   function resetGame(){
@@ -2250,7 +2412,7 @@
     comboLabel.textContent = 'COMBO 0';
     comboLabel.classList.remove('show');
     comboRank.classList.remove('rank-c','rank-b','rank-a','rank-s','rank-ss','rank-sss','show');
-    dummy.classList.remove('dizzy');
+    arena.classList.remove('combo-tier-1','combo-tier-2','combo-tier-3');
     dummy.style.transition = 'none';
     dummy.style.transform = '';
     dummy.style.opacity = '1';
@@ -2269,15 +2431,132 @@
 
   beginBtn.addEventListener('click', () => {
     ensureAudio();
-    targetName.textContent = enteredName || t('emptyNameFallback');
     if(selectedWeaponKey !== 'random' && !isWeaponUnlocked(selectedWeaponKey)) selectedWeaponKey = 'random';
     renderWeaponBar();
+
+    if(gameMode === 'story'){
+      storyActive = true;
+      storyStageIndex = 0;
+      storyTotalCombo = 0;
+      storyTotalStressDrop = 0;
+      storyTotalCalm = 0;
+      storyStageIndicator.style.display = 'block';
+      showScreen(gameScreen);
+      runStoryStage();
+      return;
+    }
+
+    storyActive = false;
+    storyStageIndicator.style.display = 'none';
+    targetName.textContent = enteredName || t('emptyNameFallback');
+
+    if(gameMode === 'coop'){
+      coopTurn = 1;
+      coopHitsSinceSwitch = 0;
+      showTurnBanner();
+    } else {
+      turnBanner.style.display = 'none';
+    }
+
     resetGame();
     showScreen(gameScreen);
     running = true;
     startTimer();
     startBGM();
     schedulePowerup();
+    if(gameMode === 'boss') scheduleBossEvent();
+  });
+
+  function showTurnBanner(){
+    const label = coopTurn === 1
+      ? (enteredName || t('coopPlayer1Default'))
+      : (enteredName2 || t('coopPlayer2Default'));
+    turnBanner.textContent = t('turnBannerText').replace('{name}', label);
+    turnBanner.style.display = 'inline-block';
+    turnBanner.style.animation = 'none';
+    void turnBanner.offsetWidth;
+    turnBanner.style.animation = '';
+  }
+
+  /* ---------------- 보스전 모드: 주기적 카운터 타이밍 이벤트 ---------------- */
+  function scheduleBossEvent(){
+    clearTimeout(bossEventTimer);
+    if(!running || gameMode !== 'boss') return;
+    const delay = 9000 + Math.random() * 4000;
+    bossEventTimer = setTimeout(()=>{
+      if(running && gameMode === 'boss') triggerBossWarning();
+    }, delay);
+  }
+
+  function triggerBossWarning(){
+    bossWarning.textContent = t('bossWarningText');
+    bossWarning.style.display = 'block';
+    setTimeout(()=>{
+      if(!running) return;
+      bossWarning.textContent = t('bossCounterText');
+      bossCounterWindowActive = true;
+      bossCounterTimeout = setTimeout(()=>{
+        bossCounterWindowActive = false;
+        bossWarning.style.display = 'none';
+        scheduleBossEvent();
+      }, 750);
+    }, 900);
+  }
+
+  function handleBossCounterHit(x, y){
+    bossCounterWindowActive = false;
+    clearTimeout(bossCounterTimeout);
+    bossWarning.style.display = 'none';
+    playCritSound();
+    screenFlash(0.35);
+    showCritText();
+    applyDamageCommon(25);
+    addUltimateCharge(30);
+    scheduleBossEvent();
+  }
+
+  /* ---------------- 스토리 모드: 3연전 + 엔딩 ---------------- */
+  function runStoryStage(){
+    const names = t('storyStageNames');
+    const reasons = t('storyStageReasons');
+    const idx = storyStageIndex;
+    targetName.textContent = names[idx];
+    enteredReason = reasons[idx];
+    storyStageIndicator.textContent = t('storyStageProgress').replace('{n}', idx+1).replace('{total}', STORY_STAGE_COUNT);
+    turnBanner.style.display = 'none';
+
+    resetGame();
+    timeLeft = 15;
+    timeLeftEl.textContent = timeLeft;
+    running = true;
+    startTimer();
+    startBGM();
+    schedulePowerup();
+  }
+
+  function handleStoryStageEnd(stressDrop, calmGain){
+    storyTotalCombo += maxCombo;
+    storyTotalStressDrop += stressDrop;
+    storyTotalCalm += calmGain;
+    storyStageIndex++;
+
+    if(storyStageIndex < STORY_STAGE_COUNT){
+      setTimeout(()=> runStoryStage(), 500);
+    } else {
+      storyActive = false;
+      storyStageIndicator.style.display = 'none';
+      document.getElementById('storyStagesResult').textContent = STORY_STAGE_COUNT;
+      document.getElementById('storyCalmResult').textContent = '+' + Math.round(storyTotalCalm);
+      document.getElementById('storyComboResult').textContent = storyTotalCombo;
+      showScreen(storyEndScreen);
+    }
+  }
+
+  storyRetryBtn.addEventListener('click', () => {
+    showScreen(startScreen);
+    nameInput.value = '';
+    reasonInput.value = '';
+    nameInput.focus();
   });
 
   function startTimer(){
@@ -2299,6 +2578,10 @@
         clearInterval(timerId);
         stopBGM();
         clearTimeout(powerupTimer);
+        clearTimeout(bossEventTimer);
+        clearTimeout(bossCounterTimeout);
+        bossCounterWindowActive = false;
+        bossWarning.style.display = 'none';
         if(audioCtx) audioCtx.suspend();
       }
     } else {
@@ -2308,6 +2591,7 @@
         startTimer();
         startBGM();
         schedulePowerup();
+        if(gameMode === 'boss') scheduleBossEvent();
       }
     }
   });
@@ -2326,6 +2610,10 @@
     clearInterval(timerId);
     stopBGM();
     clearTimeout(powerupTimer);
+    clearTimeout(bossEventTimer);
+    clearTimeout(bossCounterTimeout);
+    bossCounterWindowActive = false;
+    bossWarning.style.display = 'none';
     if(activePowerup){ activePowerup.remove(); activePowerup = null; }
     const stressDrop = 100 - stress;
     const calmGain = Math.round(stressDrop * 0.4 + maxCombo * 1.5);
@@ -2354,13 +2642,22 @@
       finishOverlay.classList.remove('show');
       finishText.textContent = '';
 
+      // 스토리 모드: 일반 결과창 대신 다음 스테이지로 진행하거나 엔딩 처리
+      if(gameMode === 'story' && storyActive){
+        handleStoryStageEnd(stressDrop, calmGain);
+        return;
+      }
+
       let headlineKey;
       if(stressDrop >= 95) headlineKey = 'great';
       else if(stressDrop >= 70) headlineKey = 'good';
       else if(stressDrop >= 40) headlineKey = 'ok';
       else headlineKey = 'low';
 
-      document.getElementById('resultTitle').textContent = targetName.textContent + t('resultTitleSuffix');
+      document.getElementById('resultTitle').textContent =
+        (gameMode === 'coop' && enteredName2)
+          ? (enteredName || t('emptyNameFallback')) + t('resultTitleSuffix') + ' (' + enteredName2 + ' & ' + (enteredName||'P1') + ')'
+          : targetName.textContent + t('resultTitleSuffix');
       document.getElementById('resultHeadline').textContent = t('headlines')[headlineKey];
       document.getElementById('stressResult').textContent = '-' + stressDrop;
       document.getElementById('calmResult').textContent = '+' + calmGain;
@@ -2534,6 +2831,43 @@
     shareBtn.textContent = originalText;
     shareBtn.disabled = false;
   });
+
+  // 친구에게 도전장 보내기: 결과를 URL 파라미터로 인코딩한 링크를 공유/복사
+  challengeBtn.addEventListener('click', async ()=>{
+    if(!lastResultData) return;
+    const params = new URLSearchParams();
+    params.set('rname', lastResultData.name);
+    params.set('rcombo', String(lastResultData.maxCombo));
+    params.set('rstress', String(lastResultData.stressDrop));
+    const url = location.origin + location.pathname + '?' + params.toString();
+    const text = t('challengeShareText').replace('{name}', lastResultData.name).replace('{combo}', lastResultData.maxCombo);
+
+    const originalText = challengeBtn.textContent;
+    try{
+      if(navigator.share){
+        await navigator.share({ title:'Stress Smash', text, url });
+      } else if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(url);
+        challengeBtn.textContent = t('challengeCopied');
+        setTimeout(()=>{ challengeBtn.textContent = originalText; }, 1500);
+      }
+    }catch(e){ /* cancelled or unsupported — ignore */ }
+  });
+
+  // 페이지 로드시 도전장 링크로 들어왔는지 확인해서 배너로 보여줌
+  function checkRivalBanner(){
+    const params = new URLSearchParams(location.search);
+    const rname = params.get('rname');
+    const rcombo = params.get('rcombo');
+    const rstress = params.get('rstress');
+    if(rname && rcombo){
+      rivalBanner.innerHTML = t('rivalBannerText')
+        .replace('{name}', rname.slice(0,12))
+        .replace('{combo}', rcombo)
+        .replace('{stress}', rstress || '0');
+      rivalBanner.style.display = 'block';
+    }
+  }
 
   function spawnFx(x, y, weaponKey, intensity){
     const def = WEAPON_MAP[weaponKey];
@@ -2874,9 +3208,23 @@
     const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
     const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
 
+    if(gameMode === 'boss' && bossCounterWindowActive){
+      handleBossCounterHit(x, y);
+      return;
+    }
+
     if(ultimateReady){
       triggerUltimate(x, y);
       return;
+    }
+
+    if(gameMode === 'coop'){
+      coopHitsSinceSwitch++;
+      if(coopHitsSinceSwitch >= COOP_SWITCH_EVERY){
+        coopHitsSinceSwitch = 0;
+        coopTurn = coopTurn === 1 ? 2 : 1;
+        showTurnBanner();
+      }
     }
 
     combo++;
@@ -2896,7 +3244,7 @@
     const isCrit = Math.random() < 0.1;
 
     const weaponKey = selectedWeaponKey === 'random'
-      ? WEAPON_DEFS[Math.floor(Math.random()*WEAPON_DEFS.length)].key
+      ? (()=>{ const pool = activeWeaponDefs(); return pool[Math.floor(Math.random()*pool.length)].key; })()
       : selectedWeaponKey;
     const weaponType = WEAPON_MAP[weaponKey].type;
     weaponCount[weaponKey] = (weaponCount[weaponKey] || 0) + 1;
@@ -2933,6 +3281,7 @@
   });
 
   applyI18n();
+  checkRivalBanner();
 })();
 
 if('serviceWorker' in navigator){
