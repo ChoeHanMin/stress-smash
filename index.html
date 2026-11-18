@@ -54,7 +54,7 @@
   .screen.active{ opacity:1; pointer-events:auto; }
 
   /* ---------- START SCREEN ---------- */
-  #start{ justify-content:center; }
+  #start{ justify-content:center; padding-top:64px; }
   .topbar{
     position:absolute; top:14px; left:14px; right:14px;
     display:flex; justify-content:space-between; z-index:5;
@@ -364,7 +364,7 @@
   .ear.right{ right:-5%; }
 
   .beard{
-    position:absolute; left:50%; top:73%; transform:translateX(-50%);
+    position:absolute; left:50%; top:76%; transform:translateX(-50%);
     width:40%; height:20%;
     border-radius:50% 50% 45% 45% / 45% 45% 55% 55%;
     border:5px solid var(--ink); z-index:2;
@@ -378,7 +378,7 @@
   }
 
   .freckles{
-    position:absolute; top:40%; width:16%; height:12%; opacity:0; z-index:2;
+    position:absolute; top:50%; width:16%; height:12%; opacity:0; z-index:2;
     pointer-events:none; transition:opacity .15s ease;
     background-image:
       radial-gradient(circle, rgba(120,72,40,0.55) 30%, transparent 32%),
@@ -393,7 +393,7 @@
   .freckles.right{ right:6%; }
 
   .mole{
-    position:absolute; top:49%; left:58%; width:3%; aspect-ratio:1/1;
+    position:absolute; top:64%; left:58%; width:3%; aspect-ratio:1/1;
     border-radius:50%; background:#3a2a1a; opacity:0; z-index:2;
     pointer-events:none; transition:opacity .15s ease;
   }
@@ -405,7 +405,7 @@
   .hairSvg path.strand{ transition:d .15s ease; }
 
   .face{
-    position:absolute; top:32%; left:50%; transform:translate(-50%,-50%);
+    position:absolute; top:40%; left:50%; transform:translate(-50%,-50%);
     width:60%; height:1px; z-index:3; pointer-events:none;
   }
   .brow{
@@ -426,12 +426,12 @@
   }
   .pupil{ width:58%; aspect-ratio:1/1; border-radius:50%; }
   .nose{
-    position:absolute; top:44%; left:50%; transform:translate(-50%,-50%);
+    position:absolute; top:57%; left:50%; transform:translate(-50%,-50%);
     border-radius:50%; background:rgba(0,0,0,0.12); border:2px solid rgba(0,0,0,0.3);
     z-index:2;
   }
   .mouth{
-    position:absolute; top:52%; left:50%; transform:translate(-50%,0);
+    position:absolute; top:69%; left:50%; transform:translate(-50%,0);
     border:6px solid var(--ink); border-top:none;
     border-radius:0 0 40px 40px; z-index:3;
     transition:border-radius .15s ease, width .15s ease, height .15s ease,
@@ -457,7 +457,7 @@
   .expr-3 .brow.left{ transform:rotate(32deg) translateY(4px); }
   .expr-3 .brow.right{ transform:rotate(-32deg) translateY(4px); }
   .expr-3 .eye{ height:55%; }
-  .expr-3 .mouth{ border-radius:50%; border:6px solid var(--ink); width:26%; height:22%; top:56%; }
+  .expr-3 .mouth{ border-radius:50%; border:6px solid var(--ink); width:26%; height:14%; top:68%; }
 
   .torso.reaction-gross{ filter:hue-rotate(70deg) saturate(1.3); }
   .torso.reaction-wet{ filter:brightness(0.96) saturate(1.15); }
@@ -661,6 +661,176 @@
     border:none; border-radius:10px; padding:9px 22px; cursor:pointer;
   }
 
+  .topbar .pillBtn{ padding:6px 10px; }
+  #feverBanner{
+    position:absolute; top:14%; left:50%; transform:translateX(-50%) scale(.6);
+    font-family:'Jua',sans-serif; font-size:30px; color:#fff; -webkit-text-stroke:2px var(--ink);
+    text-shadow:3px 3px 0 var(--ink); opacity:0; pointer-events:none; z-index:30; white-space:nowrap;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  #feverBanner.show{ opacity:1; transform:translateX(-50%) scale(1); animation:feverPulse .5s ease-in-out infinite alternate; }
+  @keyframes feverPulse{ from{ color:#ffd23f; } to{ color:#ff5a2e; } }
+  #arena.fever{ box-shadow:inset 0 0 0 5px #ff5a2e, inset 0 0 40px 6px rgba(255,140,40,.55); }
+  .missionItem{ text-align:left; font-size:14px; margin:0 0 10px; padding:8px 10px; border:3px solid var(--ink); border-radius:10px; background:#fff9e6; }
+  .missionItem.done{ background:#dff7df; }
+  .missionItem .mbar{ height:8px; border:2px solid var(--ink); border-radius:6px; background:#fff; margin-top:5px; overflow:hidden; }
+  .missionItem .mbar i{ display:block; height:100%; background:var(--hotpink); }
+  .missionItem.done .mbar i{ background:#2fb34a; }
+  #missionToast{
+    position:fixed; left:50%; top:18px; transform:translate(-50%,-80px); z-index:990;
+    font-family:'Jua',sans-serif; font-size:14px; background:#fff; border:4px solid var(--ink);
+    border-radius:12px; box-shadow:4px 4px 0 var(--ink); padding:8px 14px; transition:transform .3s ease; pointer-events:none;
+  }
+  #missionToast.show{ transform:translate(-50%,0); }
+
+  /* =========================================================
+     REALISM PASS — 만화 외곽선 대신 음영/하이라이트/질감으로 사실적인 사람 느낌
+     ========================================================= */
+  .torso{
+    border:1.5px solid rgba(80,40,25,.55);
+    background-image:
+      radial-gradient(ellipse 38% 12% at 27% 58%, rgba(226,96,86,.26), transparent 70%),
+      radial-gradient(ellipse 38% 12% at 73% 58%, rgba(226,96,86,.26), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 34% 22%, rgba(255,255,255,.30), transparent 70%),
+      radial-gradient(ellipse 90% 45% at 50% 108%, rgba(90,35,15,.38), transparent 70%),
+      radial-gradient(ellipse 30% 70% at 100% 50%, rgba(70,30,10,.25), transparent 80%),
+      radial-gradient(ellipse 30% 70% at 0% 50%, rgba(70,30,10,.15), transparent 80%);
+    box-shadow: inset -6px -9px 14px rgba(70,30,10,.22), inset 4px 5px 10px rgba(255,255,255,.12), 0 3px 8px rgba(0,0,0,.18);
+  }
+  .neckShape{
+    background-image:linear-gradient(180deg, rgba(60,25,10,.55) 0%, rgba(60,25,10,.18) 45%, rgba(0,0,0,0) 100%);
+    box-shadow: inset 5px 0 8px rgba(60,25,10,.2), inset -5px 0 8px rgba(60,25,10,.2);
+    border-radius:0 0 30% 30%;
+  }
+  .bodyShape{
+    border:1.5px solid rgba(40,30,30,.6);
+    box-shadow: inset -8px -10px 16px rgba(0,0,0,.28), inset 6px 6px 14px rgba(255,255,255,.10), 0 6px 10px rgba(0,0,0,.2);
+    background-image:linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,.22));
+  }
+  .bodyShape::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; z-index:0;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.30), rgba(255,255,255,.08) 28%, rgba(255,255,255,.04) 60%, rgba(0,0,0,.34)),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, rgba(0,0,0,.05) 2px 4px),
+      linear-gradient(180deg, #46566f, #2f3b50);
+    box-shadow: inset 0 14px 12px -10px rgba(0,0,0,.45);
+  }
+  .bodyShape::after{
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:30%; height:30%; z-index:1;
+    background:
+      linear-gradient(180deg, rgba(60,25,10,.35), rgba(0,0,0,0) 70%),
+      var(--skin, #f0c4a0);
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+  }
+  .ear{ border:1.5px solid rgba(80,40,25,.55);
+    background-image:radial-gradient(ellipse at 40% 50%, rgba(150,60,40,.38) 0 28%, transparent 60%), radial-gradient(ellipse at 30% 25%, rgba(255,255,255,.2), transparent 60%);
+    box-shadow: inset -2px -3px 5px rgba(70,30,10,.25); }
+  .doubleChin{ border:1.5px solid rgba(80,40,25,.35); }
+  .beard{ border:none; opacity:0;
+    background-image:repeating-radial-gradient(circle at 30% 30%, rgba(255,255,255,.07) 0 1px, rgba(0,0,0,.10) 1px 3px);
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,.4); }
+  .brow{
+    height:5px; background:linear-gradient(90deg, transparent 0, var(--hairc,#2b1d14) 22%, var(--hairc,#2b1d14) 70%, transparent 100%);
+    border-radius:50% 50% 40% 40%; filter:blur(.25px);
+  }
+  .eye{
+    aspect-ratio:1/.62; border-radius:55% 55% 50% 50% / 60% 60% 55% 55%; overflow:hidden;
+    background:radial-gradient(ellipse at 50% 45%, #ffffff 50%, #e8dcd6 100%);
+    border:1px solid rgba(40,20,15,.55);
+    box-shadow: inset 0 4px 0 -1px rgba(25,12,8,.9), inset 0 6px 6px rgba(0,0,0,.28);
+  }
+  .pupil{
+    width:56%; aspect-ratio:1/1; border-radius:50%;
+    background:
+      radial-gradient(circle at 34% 30%, rgba(255,255,255,.95) 0 11%, transparent 13%),
+      radial-gradient(circle, #040404 0 30%, var(--iris,#4a2e1a) 34% 78%, rgba(0,0,0,.65) 100%);
+  }
+  .eyelidCrease{ border-top:1.5px solid rgba(70,35,25,.5); }
+  .nose{
+    border:none; border-radius:38% 38% 50% 50%;
+    background:
+      radial-gradient(ellipse at 50% 28%, rgba(255,255,255,.28), transparent 45%),
+      radial-gradient(ellipse at 50% 90%, rgba(100,45,25,.42), transparent 62%);
+    box-shadow: -3px 0 4px -2px rgba(90,40,20,.3), 3px 0 4px -2px rgba(90,40,20,.3);
+  }
+  .nose::before, .nose::after{
+    content:''; position:absolute; bottom:8%; width:22%; height:20%; border-radius:50%; background:rgba(60,20,10,.55);
+  }
+  .nose::before{ left:20%; } .nose::after{ right:20%; }
+  .mouth{
+    border-style:solid; border-top:none; filter:none;
+    box-shadow:0 2px 2px rgba(255,255,255,.15);
+  }
+  .expr-2 .mouth{ border-top-style:solid; }
+  .expr-3 .mouth{ background:radial-gradient(ellipse at 50% 70%, #8a2f2f 0 30%, #2a0a0a 70%) !important; }
+  .tear{ border:1px solid rgba(255,255,255,.6); background:linear-gradient(160deg, rgba(190,235,255,.95), rgba(80,170,230,.85)); }
+  .hairSvg{ filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+
+  .weakPoint{
+    position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:25; pointer-events:none;
+    font-size:30px; line-height:46px; text-align:center; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.9) 0 25%, rgba(255,60,60,.55) 60%, rgba(255,60,60,0) 72%);
+    animation:weakPulse .45s ease-in-out infinite alternate;
+  }
+  @keyframes weakPulse{ from{ transform:scale(.85); } to{ transform:scale(1.15); } }
+  .dmgNum{
+    position:absolute; z-index:26; pointer-events:none; font-family:'Jua',sans-serif; font-size:22px; color:#fff;
+    -webkit-text-stroke:1.5px var(--ink); text-shadow:2px 2px 0 var(--ink);
+    transition:transform .6s ease-out, opacity .6s ease-out;
+  }
+  .dmgNum.crit{ font-size:32px; color:#ffd23f; }
+  .dmgNum.weak{ font-size:34px; color:#ff4d4d; }
+
+  /* ---- 이모지 없이 CSS로 그린 이펙트/반창고 ---- */
+  .weapon-fx{
+    font-size:0; width:52px; height:52px; border-radius:50%;
+    background:radial-gradient(circle, #fff 0 18%, rgba(255,205,70,.95) 38%, rgba(255,100,40,.55) 58%, rgba(255,80,40,0) 72%);
+    clip-path:polygon(50% 0,60% 30%,95% 20%,70% 45%,100% 60%,66% 66%,75% 100%,50% 76%,25% 100%,34% 66%,0 60%,30% 45%,5% 20%,40% 30%);
+  }
+  .debris{ font-size:0; border-radius:2px; }
+  .patch{ font-size:0; filter:none; }
+  .patch1, .patch2, .patch4{
+    width:34px; height:13px; border-radius:7px;
+    background:linear-gradient(180deg, #f1cfa6, #d9a877);
+    border:1px solid rgba(120,70,40,.55);
+    box-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  .patch1::after, .patch2::after, .patch4::after{
+    content:''; position:absolute; left:34%; top:0; width:32%; height:100%;
+    background:repeating-linear-gradient(45deg, #efe6dc 0 2px, #e0d3c4 2px 4px); border-left:1px solid rgba(0,0,0,.15); border-right:1px solid rgba(0,0,0,.15);
+  }
+  .patch3{
+    width:46px; height:34px; border-radius:50%;
+    background:radial-gradient(circle, rgba(110,60,150,.55) 0, rgba(190,70,90,.35) 55%, rgba(190,70,90,0) 78%);
+    mix-blend-mode:multiply;
+  }
+  .patch5{
+    width:24px; height:24px; border-radius:4px;
+    background:repeating-linear-gradient(0deg, #fafafa 0 3px, #ececec 3px 6px);
+    border:1px solid rgba(0,0,0,.25); box-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  .orbit span{
+    font-size:0; width:14px; height:14px; background:linear-gradient(135deg,#fff7b0,#ffd23f);
+    clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+  }
+  .weakPoint{
+    font-size:0; background:none; border:3px solid #ff3b3b; box-shadow:0 0 10px rgba(255,60,60,.8), inset 0 0 8px rgba(255,60,60,.5);
+  }
+  .weakPoint::before{ content:''; position:absolute; left:50%; top:-8px; bottom:-8px; width:3px; margin-left:-1.5px; background:#ff3b3b; }
+  .weakPoint::after{ content:''; position:absolute; top:50%; left:-8px; right:-8px; height:3px; margin-top:-1.5px; background:#ff3b3b; }
+  .powerup{ font-family:'Jua',sans-serif; font-size:13px !important; letter-spacing:0; }
+  /* 눈 깜빡임 */
+  .eye{ animation:blink 4.6s infinite; transform-origin:50% 60%; }
+  @keyframes blink{ 0%,93%,100%{ transform:scaleY(1); } 96%{ transform:scaleY(.08); } }
+  #pv_eyeL, #pv_eyeR{ animation:none; }
+
+  .gradeBadge{
+    font-family:'Jua',sans-serif; font-size:64px; line-height:1; color:#fff; -webkit-text-stroke:3px var(--ink);
+    text-shadow:4px 4px 0 var(--ink); margin:2px 0 4px; transform:rotate(-6deg);
+  }
+  .gradeBadge.g-S{ color:#ffd23f; } .gradeBadge.g-A{ color:#ff2f6e; } .gradeBadge.g-B{ color:#3ec6ff; } .gradeBadge.g-C{ color:#cfcfcf; }
+  .recordNote{ font-family:'Jua',sans-serif; font-size:14px; color:#fff; background:var(--hotpink,#ff2f6e); border:3px solid var(--ink); border-radius:999px; padding:3px 12px; margin:0 0 8px; }
   #result h2{ font-family:'Jua',sans-serif; font-size:clamp(22px,5.6vw,28px); margin-bottom:4px; word-break:keep-all; }
   .resultCard{
     background:#fff; border:5px solid var(--ink); border-radius:18px; box-shadow:6px 6px 0 var(--ink);
@@ -678,18 +848,21 @@
 </head>
 <body>
 <div id="flash"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="hairShineGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".25" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity=".0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient></defs></svg>
 
 <!-- START -->
 <div id="start" class="screen active">
   <div class="topbar">
     <button class="pillBtn" id="devBtn" data-i18n="devBtn">개발자</button>
+    <button class="pillBtn" id="missionBtn" data-i18n="missionBtn">미션</button>
+    <button class="pillBtn" id="vibBtn">📳</button>
     <button class="pillBtn" id="langBtn">English</button>
   </div>
   <div class="badge" data-i18n="badge">STRESS SMASH</div>
   <div id="rivalBanner" class="rivalBanner" style="display:none;"></div>
   <h1><span data-i18n="titleLine1">오늘</span><br><span data-i18n="titleLine2">어떤 새끼 때문에</span><br><span data-i18n="titleLine3">빡쳤나요?</span></h1>
   <input id="nameInput" type="text" maxlength="12" data-i18n-placeholder="namePlaceholder" placeholder="이름(or 별명)을 적어주세요">
-  <button class="randomBtn" id="randomNameBtn" data-i18n="randomNameBtn">🎲 아무나 뽑아줘</button>
+  <button class="randomBtn" id="randomNameBtn" data-i18n="randomNameBtn">아무나 뽑아줘</button>
 
   <div class="cust-row" style="width:min(320px,80vw); margin:0 0 14px;">
     <span class="cust-label" data-i18n="modeLabel" style="justify-content:center; font-size:12px;">게임 모드</span>
@@ -736,7 +909,8 @@
         <div class="torso" id="pv_torso">
           <div class="ear left" id="pv_earL"></div><div class="ear right" id="pv_earR"></div>
           <svg class="hairSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path id="pv_hairPath" stroke="#151316" stroke-width="3"></path>
+            <path id="pv_hairPath" stroke="rgba(0,0,0,.35)" stroke-width="1"></path>
+            <path class="hairShine" fill="url(#hairShineGrad)" stroke="none"></path>
             <path class="strand" id="pv_strand1" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
             <path class="strand" id="pv_strand2" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
           </svg>
@@ -767,11 +941,13 @@
     <div class="cust-row">
       <span class="cust-label" data-i18n="skinLabel">피부색</span>
       <div class="swatches" data-target="skin">
-        <div class="swatch selected" style="background:#ffd400" data-value="#ffd400"></div>
-        <div class="swatch" style="background:#ffe0bd" data-value="#ffe0bd"></div>
-        <div class="swatch" style="background:#ffb877" data-value="#ffb877"></div>
-        <div class="swatch" style="background:#e8967a" data-value="#e8967a"></div>
+        <div class="swatch" style="background:#f8e0cc" data-value="#f8e0cc"></div>
+        <div class="swatch selected" style="background:#f0c4a0" data-value="#f0c4a0"></div>
+        <div class="swatch" style="background:#d9a577" data-value="#d9a577"></div>
+        <div class="swatch" style="background:#b07a4f" data-value="#b07a4f"></div>
         <div class="swatch" style="background:#8d5524" data-value="#8d5524"></div>
+        <div class="swatch" style="background:#5c3a21" data-value="#5c3a21"></div>
+        <div class="swatch" style="background:#ffd400" data-value="#ffd400"></div>
         <div class="swatch" style="background:#a9dfff" data-value="#a9dfff"></div>
         <div class="swatch" style="background:#c9f7c1" data-value="#c9f7c1"></div>
         <div class="swatch" style="background:#d6b8ff" data-value="#d6b8ff"></div>
@@ -815,7 +991,8 @@
         <div class="cust-row">
           <span class="cust-label" data-i18n="eyeColorLabel">눈동자색</span>
           <div class="swatches" data-target="eye">
-            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch selected" style="background:#4a2e1a" data-value="#4a2e1a"></div>
+            <div class="swatch" style="background:#151316" data-value="#151316"></div>
             <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
             <div class="swatch" style="background:#3ddc84" data-value="#3ddc84"></div>
             <div class="swatch" style="background:#8b5cf6" data-value="#8b5cf6"></div>
@@ -854,7 +1031,8 @@
         <div class="cust-row">
           <span class="cust-label" data-i18n="lipColorLabel">입술색</span>
           <div class="swatches" data-target="lip">
-            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch selected" style="background:#b5524f" data-value="#b5524f"></div>
+            <div class="swatch" style="background:#d98880" data-value="#d98880"></div>
             <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
             <div class="swatch" style="background:#c0392b" data-value="#c0392b"></div>
             <div class="swatch" style="background:#e67e22" data-value="#e67e22"></div>
@@ -875,8 +1053,10 @@
         <div class="cust-row">
           <span class="cust-label" data-i18n="hairColorLabel">머리색</span>
           <div class="swatches" data-target="hair">
-            <div class="swatch selected" style="background:#151316" data-value="#151316"></div>
+            <div class="swatch selected" style="background:#2b1d14" data-value="#2b1d14"></div>
+            <div class="swatch" style="background:#0e0c0d" data-value="#0e0c0d"></div>
             <div class="swatch" style="background:#6b3f1d" data-value="#6b3f1d"></div>
+            <div class="swatch" style="background:#c9a15a" data-value="#c9a15a"></div>
             <div class="swatch" style="background:#ff2f6e" data-value="#ff2f6e"></div>
             <div class="swatch" style="background:#3ec6ff" data-value="#3ec6ff"></div>
             <div class="swatch" style="background:#f4f4f4" data-value="#f4f4f4"></div>
@@ -922,7 +1102,7 @@
   </div>
 
   <button class="bigbtn" id="beginBtn" data-i18n="startBtn">패러 가기 →</button>
-  <p class="sub" data-i18n="startSub">※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다 😌</p>
+  <p class="sub" data-i18n="startSub">※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다</p>
 </div>
 
 <!-- GAME -->
@@ -951,6 +1131,7 @@
   <div class="weaponBar" id="weaponBar"></div>
 
   <div class="arena" id="arena">
+      <div id="feverBanner"></div>
     <div id="bossWarning" class="bossWarning" style="display:none;"></div>
     <div class="dummy" id="dummy">
       <div class="bodyShape" id="gm_body"></div>
@@ -958,7 +1139,8 @@
       <div class="torso" id="gm_torso">
         <div class="ear left" id="gm_earL"></div><div class="ear right" id="gm_earR"></div>
         <svg class="hairSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path id="gm_hairPath" stroke="#151316" stroke-width="3"></path>
+          <path id="gm_hairPath" stroke="rgba(0,0,0,.35)" stroke-width="1"></path>
+            <path class="hairShine" fill="url(#hairShineGrad)" stroke="none"></path>
           <path class="strand" id="gm_strand1" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
           <path class="strand" id="gm_strand2" fill="none" stroke-width="1.3" stroke-linecap="round" opacity="0.5"></path>
         </svg>
@@ -976,13 +1158,13 @@
         <div class="doubleChin" id="gm_chin"></div>
         <div class="huff left"></div><div class="huff right"></div>
         <div class="orbit" id="orbit">
-          <span>⭐</span><span>💫</span><span>⭐</span><span>💫</span>
+          <span></span><span></span><span></span><span></span>
         </div>
-        <div class="patch patch1">🩹</div>
-        <div class="patch patch2">🩹</div>
-        <div class="patch patch3">🧊</div>
-        <div class="patch patch4">🦴</div>
-        <div class="patch patch5">🩼</div>
+        <div class="patch patch1"></div>
+        <div class="patch patch2"></div>
+        <div class="patch patch3"></div>
+        <div class="patch patch4"></div>
+        <div class="patch patch5"></div>
       </div>
     </div>
     <div class="signPost" id="signPost">
@@ -995,10 +1177,19 @@
 
 <div id="finishOverlay"><div id="finishText"></div></div>
 
+<div id="missionToast"></div>
+<div class="modalOverlay" id="missionModal">
+  <div class="modalCard">
+    <h3 data-i18n="missionTitle">오늘의 미션</h3>
+    <div id="missionList"></div>
+    <p id="missionHint" style="margin:6px 0 14px;font-size:12px;"></p>
+    <button class="modalClose" id="missionClose" data-i18n="devModalClose">닫기</button>
+  </div>
+</div>
 <div class="modalOverlay" id="devModal">
   <div class="modalCard">
     <h3 data-i18n="devModalTitle">개발자 정보</h3>
-    <p data-i18n-html="devModalText">제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요 👊</p>
+    <p data-i18n-html="devModalText">제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요</p>
     <button class="modalClose" id="devModalClose" data-i18n="devModalClose">닫기</button>
   </div>
 </div>
@@ -1007,7 +1198,9 @@
 <div id="result" class="screen">
   <div class="badge" data-i18n="resultBadge">RESULT</div>
   <p id="resultTitle"></p>
+  <div class="gradeBadge" id="gradeBadge"></div>
   <h2 id="resultHeadline"></h2>
+  <div class="recordNote" id="recordNote" style="display:none;"></div>
   <div class="badge styleTitleBadge" id="styleTitleBadge" style="display:none;"></div>
   <div class="resultCard">
     <div class="resultRow"><span data-i18n="stressLabel">스트레스</span><b class="stress-down" id="stressResult">-0</b></div>
@@ -1016,14 +1209,14 @@
     <div class="resultRow"><span data-i18n="weaponLabel">가장 많이 쓴 무기</span><b id="weaponResult">-</b></div>
   </div>
   <button class="bigbtn" id="retryBtn" data-i18n="retryBtn">한 판 더 패기</button>
-  <button class="randomBtn" id="shareBtn" data-i18n="shareBtn">📸 결과 이미지 저장</button>
-  <button class="randomBtn" id="challengeBtn" data-i18n="challengeBtn">🔗 친구에게 도전장</button>
+  <button class="randomBtn" id="shareBtn" data-i18n="shareBtn">결과 이미지 저장</button>
+  <button class="randomBtn" id="challengeBtn" data-i18n="challengeBtn">친구에게 도전장</button>
 </div>
 
 <!-- STORY END -->
 <div id="storyEnd" class="screen">
   <div class="badge" data-i18n="storyClearBadge">STORY CLEAR</div>
-  <h2 data-i18n="storyClearTitle">오늘 하루, 완벽하게 청산했다 🎉</h2>
+  <h2 data-i18n="storyClearTitle">오늘 하루, 완벽하게 청산했다</h2>
   <div class="resultCard">
     <div class="resultRow"><span data-i18n="storyStagesLabel">처단한 인원</span><b class="combo-max" id="storyStagesResult">3</b></div>
     <div class="resultRow"><span data-i18n="calmLabel">평정심</span><b class="calm-up" id="storyCalmResult">+0</b></div>
@@ -1049,7 +1242,7 @@
       reasonSub:'※ 안 적어도 괜찮아요. 그냥 패면 됩니다.',
       reasonDefault:'그냥 좀 맞아야 할 것 같아서',
       devModalTitle:'개발자 정보',
-      devModalText:'제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요 👊',
+      devModalText:'제작: 최한민<br>이 게임은 스트레스 해소용 병맛 프로토타입이에요. 즐겁게 패고 가세요',
       devModalClose:'닫기',
       customizeTitle:'샌드백 커스터마이징',
       genderLabel:'성별', genderNeutral:'중성', genderMale:'남성', genderFemale:'여성',
@@ -1072,48 +1265,54 @@
       chubbyLabel:'살집', chubbyTag:'보통 ↔ 통통',
       earSizeLabel:'귀 크기', earSizeTag:'작게 ↔ 크게',
       startBtn:'패러 가기 →',
-      startSub:'※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다 😌',
+      startSub:'※ 실제 얼굴 사진 대신 커스텀 샌드백 캐릭터가 대신 맞아드립니다',
       tapHint:'화면을 마구 두드려서 스트레스를 날려버리세요!',
       resultBadge:'RESULT',
       stressLabel:'스트레스', calmLabel:'평정심', comboMaxLabel:'최대 콤보', weaponLabel:'가장 많이 쓴 무기',
       retryBtn:'한 판 더 패기',
-      resultTitleSuffix:' 처단 완료',
-      headlines:{ great:'완전 초토화 🔥', good:'속이 다 시원하다 😌', ok:'그래도 좀 풀렸다 🙂', low:'아직 덜 풀렸는데...? 😤' },
+      resultTitleSuffix:'처단 완료',
+      headlines:{ great:'완전 초토화', good:'속이 다 시원하다', ok:'그래도 좀 풀렸다', low:'아직 덜 풀렸는데...?' },
       weapons:{
         fist:'주먹', hammer:'뿅망치', cushion:'쿠션', papers:'서류뭉치', keyboard:'키보드', chicken:'고무닭',
         slipper:'대왕 슬리퍼', pan:'프라이팬', books:'전공책 더미', broom:'빗자루', waterballoon:'물풍선',
         confetti:'컨페티 캐논', extinguisher:'소화기', glove:'복싱글러브 발사기', fan:'부채',
         fart:'방귀 폭탄', fish:'언 동태', sock:'냄새나는 양말', sax:'색소폰 (뿅!)', toiletpaper:'두루마리 휴지',
-        santabat:'산타 방망이', pumpkin:'호박 랜턴', roses:'장미 다발', watergun:'물총'
+        goldhammer:'황금 망치', santabat:'산타 방망이', pumpkin:'호박 랜턴', roses:'장미 다발', watergun:'물총'
       },
       randomLabel:'랜덤',
       burstLow:['퍽!','툭!','팡!','텅!'], burstMid:['빠악!','으적!','우당탕!','캬악!'], burstHigh:['박살!!','와지끈!!','뿌지직!!','뻐어어억!!'],
       burstWet:['철퍽!','촤악!'], burstGross:['뿌우웅!','흐엑!'], burstMusical:['빠앙!','뚜루루!'],
       burstParty:['짜잔!','와아!'], burstHiss:['치이익!'], burstGust:['휘이잉~'],
-      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','전설의 손맛 👑'],
+      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','전설의 손맛'],
       yelps:{ male:['윽!','으악!','아야!'], female:['꺄악!','아앗!','악!'], neutral:['으악!','악!','윽!'] },
       taunts:['안 아픈데?','응 어쩔','그게 다야?','간지러운데','더 세게 때려봐','느낌도 없다','약한데?','이 정도로 되겠어?'],
       ultimateLabel:'필살기',
-      randomNameBtn:'🎲 아무나 뽑아줘',
+      randomNameBtn:'아무나 뽑아줘',
       difficultyLabel:'난이도', difficultyNormal:'기본', difficultyHard:'하드',
       modeLabel:'게임 모드', modeNormal:'기본', modeCoop:'협동', modeBoss:'보스전', modeStory:'스토리',
       name2Placeholder:'플레이어 2 이름',
       coopPlayer1Default:'플레이어 1', coopPlayer2Default:'플레이어 2',
-      turnBannerText:'🙌 {name} 차례!',
-      bossWarningText:'⚠️ 반격 온다!', bossCounterText:'👊 지금 탭!',
+      turnBannerText:'{name} 차례!',
+      bossWarningText:'반격 온다!', bossCounterText:'지금 탭!',
       storyStageNames:['말 끊는 팀장','단톡방에 캡처 뿌리는 친구','주차 두 칸 쓰는 이웃'],
       storyStageReasons:['회의마다 내 말을 끊음','몰래 캡처해서 소문냄','맨날 두 칸 걸쳐 주차함'],
       storyStageProgress:'상대 {n}/{total}',
       storyClearBadge:'STORY CLEAR',
-      storyClearTitle:'오늘 하루, 완벽하게 청산했다 🎉',
+      storyClearTitle:'오늘 하루, 완벽하게 청산했다',
       storyStagesLabel:'처단한 인원',
-      powerupTimeUnit:'초', powerupUltimateText:'⚡ 필살기 충전!',
-      challengeBtn:'🔗 친구에게 도전장', challengeCopied:'링크 복사됨!',
-      challengeShareText:'{name}를 콤보 {combo}로 처단했다! 너도 이겨봐 👊',
-      rivalBannerText:'<b>{name}</b>님의 기록: 콤보 {combo} / 스트레스 -{stress}. 이겨보자! 🔥',
+      powerupTimeUnit:'초', powerupUltimateText:'필살기 충전!',
+      challengeBtn:'친구에게 도전장', challengeCopied:'링크 복사됨!',
+      challengeShareText:'{name}를 콤보 {combo}로 처단했다! 너도 이겨봐',
+      rivalBannerText:'<b>{name}</b>님의 기록: 콤보 {combo} / 스트레스 -{stress}. 이겨보자!',
       randomNamePresets:['옆팀 김대리','단톡방 프사 안 바꾸는 애','발표 5분 전에 자료 바꾸는 팀장','택배 상하차 시키는 사장님','지하철에서 이어폰 안 낀 사람','카톡 3일째 읽씹인 친구','내 앞에서 새치기한 사람','알람 5번 미루고 나만 깨우는 룸메','회의 끝나고 다시 잡자는 사람','내 아이디어 자기 것처럼 말하는 동료'],
-      shareBtn:'📸 결과 이미지 저장',
+      shareBtn:'결과 이미지 저장',
       lockedHint:'아직 잠겨있어요',
+      modTitle:'이번 판 룰', modLucky:'약점 러시: 약점이 자주 나와요', modBonus:'여유 타임: 제한시간 +8초', modRage:'분노 모드: 데미지 1.3배', newRecord:'최고 콤보 갱신!', weakText:'약점!', missionBtn:'미션', missionTitle:'오늘의 미션', feverText:'피버 타임!!',
+      missionDone:'미션 완료!', missionAllDone:'오늘 미션 전부 클리어!',
+      missionHintText:'미션 {n}개 클리어 누적 (5개 달성 시 ???)', missionHintUnlocked:'히든 무기 해금됨: 황금 망치',
+      hiddenUnlocked:'히든 무기 해금: 황금 망치!',
+      vibOn:'진동 ON', vibOff:'진동 OFF',
+      missions:{ hits:'총 {n}번 때리기', combo:'콤보 {n} 달성', crits:'크리티컬 {n}번', fever:'피버 타임 {n}번 발동', unique:'한 판에 무기 {n}종 사용', ko:'KO로 {n}판 끝내기', games:'{n}판 플레이' },
       critText:'크리티컬!!',
       ultimateReadyHint:'꽉 찼다! 한 번 더 탭!',
       ultimateHitText:'필살기!!!',
@@ -1136,7 +1335,7 @@
       reasonSub:"※ It's fine to leave this blank. Just start smashing.",
       reasonDefault:'just felt like it',
       devModalTitle:'About the developer',
-      devModalText:'Made by Choi Hanmin<br>A goofy little prototype for blowing off steam. Have fun smashing 👊',
+      devModalText:'Made by Choi Hanmin<br>A goofy little prototype for blowing off steam. Have fun smashing',
       devModalClose:'Close',
       customizeTitle:'Customize your target',
       genderLabel:'Gender', genderNeutral:'Neutral', genderMale:'Male', genderFemale:'Female',
@@ -1159,48 +1358,54 @@
       chubbyLabel:'Body fat', chubbyTag:'Average ↔ Chubby',
       earSizeLabel:'Ear size', earSizeTag:'Small ↔ Big',
       startBtn:'Start smashing →',
-      startSub:'※ Instead of a real photo, a custom sandbag character takes the hits for you 😌',
+      startSub:'※ Instead of a real photo, a custom sandbag character takes the hits for you',
       tapHint:'Tap the screen like crazy and blast your stress away!',
       resultBadge:'RESULT',
       stressLabel:'Stress', calmLabel:'Calm', comboMaxLabel:'Best combo', weaponLabel:'Most-used weapon',
       retryBtn:'Smash again',
-      resultTitleSuffix:' — case closed',
-      headlines:{ great:'Completely wrecked 🔥', good:'That felt so good 😌', ok:'A bit better now 🙂', low:'Still not over it...? 😤' },
+      resultTitleSuffix:'— case closed',
+      headlines:{ great:'Completely wrecked', good:'That felt so good', ok:'A bit better now', low:'Still not over it...?' },
       weapons:{
         fist:'Fist', hammer:'Squeaky hammer', cushion:'Cushion', papers:'Paper stack', keyboard:'Keyboard', chicken:'Rubber chicken',
         slipper:'Giant slipper', pan:'Frying pan', books:'Textbook stack', broom:'Broom', waterballoon:'Water balloon',
         confetti:'Confetti cannon', extinguisher:'Fire extinguisher', glove:'Boxing glove launcher', fan:'Fan',
         fart:'Fart bomb', fish:'Frozen fish', sock:'Stinky sock', sax:'Honking saxophone', toiletpaper:'Toilet paper roll',
-        santabat:'Santa bat', pumpkin:'Jack-o-lantern', roses:'Bouquet of roses', watergun:'Water gun'
+        goldhammer:'Golden hammer', santabat:'Santa bat', pumpkin:'Jack-o-lantern', roses:'Bouquet of roses', watergun:'Water gun'
       },
       randomLabel:'Random',
       burstLow:['POW!','BONK!','THWAP!','BAM!'], burstMid:['SMACK!','CRUNCH!','WHUMP!','YOWCH!'], burstHigh:['CRUSHED!!','SPLAT!!','DEMOLISHED!!','OBLITERATED!!'],
       burstWet:['SPLASH!','SPLOOSH!'], burstGross:['PFFFT!','EWWW!'], burstMusical:['HONK!','TOOT!'],
       burstParty:['TA-DA!','WOO!'], burstHiss:['PSHHH!'], burstGust:['WHOOSH!'],
-      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','Legendary hands 👑'],
+      milestones:['MEGA COMBO!','UNSTOPPABLE!','GODLIKE!!','Legendary hands'],
       yelps:{ male:['Ugh!','Ow!','Argh!'], female:['Eek!','Yikes!','Ow!'], neutral:['Ow!','Ugh!','Ouch!'] },
       taunts:["Didn't feel a thing","So what?","Is that all you got?","That tickles","Hit harder","Nothing happened","Weak.","You call that a hit?"],
       ultimateLabel:'Ultimate',
-      randomNameBtn:'🎲 Pick someone for me',
+      randomNameBtn:'Pick someone for me',
       difficultyLabel:'Difficulty', difficultyNormal:'Normal', difficultyHard:'Hard',
       modeLabel:'Game Mode', modeNormal:'Normal', modeCoop:'Co-op', modeBoss:'Boss', modeStory:'Story',
       name2Placeholder:'Player 2 name',
       coopPlayer1Default:'Player 1', coopPlayer2Default:'Player 2',
-      turnBannerText:"🙌 {name}'s turn!",
-      bossWarningText:'⚠️ Counter incoming!', bossCounterText:'👊 Tap now!',
+      turnBannerText:"{name}'s turn!",
+      bossWarningText:'Counter incoming!', bossCounterText:'Tap now!',
       storyStageNames:['The boss who cuts you off','The friend who screenshots the group chat','The neighbor who parks across two spots'],
       storyStageReasons:['Interrupts me every meeting','Screenshots and spreads gossip','Always takes up two parking spots'],
       storyStageProgress:'Opponent {n}/{total}',
       storyClearBadge:'STORY CLEAR',
-      storyClearTitle:"Today's grudges? Fully settled 🎉",
+      storyClearTitle:"Today's grudges? Fully settled",
       storyStagesLabel:'Opponents defeated',
-      powerupTimeUnit:'s', powerupUltimateText:'⚡ Ultimate charged!',
-      challengeBtn:'🔗 Challenge a friend', challengeCopied:'Link copied!',
-      challengeShareText:'I smashed {name} with a {combo} combo! Beat that 👊',
-      rivalBannerText:"<b>{name}</b>'s record: {combo} combo / -{stress} stress. Beat it! 🔥",
+      powerupTimeUnit:'s', powerupUltimateText:'Ultimate charged!',
+      challengeBtn:'Challenge a friend', challengeCopied:'Link copied!',
+      challengeShareText:'I smashed {name} with a {combo} combo! Beat that',
+      rivalBannerText:"<b>{name}</b>'s record: {combo} combo / -{stress} stress. Beat it!",
       randomNamePresets:['That guy from marketing','My group chat\'s silent reader','The boss who "needs it by EOD"','My neighbor\'s car alarm','The line-cutter at the coffee shop','My roommate who never does dishes','The reply-all email guy','My landlord','The friend who left me on read for 3 days','The coworker who takes credit for my ideas'],
-      shareBtn:'📸 Save result image',
+      shareBtn:'Save result image',
       lockedHint:'Still locked',
+      modTitle:'Round rule', modLucky:'Weak-point rush: targets appear often', modBonus:'Extra time: +8 seconds', modRage:'Rage mode: 1.3x damage', newRecord:'New best combo!', weakText:'WEAK!', missionBtn:'Missions', missionTitle:"Today's Missions", feverText:'FEVER TIME!!',
+      missionDone:'Mission clear!', missionAllDone:'All daily missions cleared!',
+      missionHintText:'Missions cleared: {n} (hit 5 to unlock ???)', missionHintUnlocked:'Hidden weapon unlocked: Golden Hammer',
+      hiddenUnlocked:'Hidden weapon unlocked: Golden Hammer!',
+      vibOn:'Vibration ON', vibOff:'Vibration OFF',
+      missions:{ hits:'Land {n} hits', combo:'Reach combo {n}', crits:'{n} critical hits', fever:'Trigger Fever Time {n}x', unique:'Use {n} different weapons in one round', ko:'Finish {n} rounds with a KO', games:'Play {n} rounds' },
       critText:'CRITICAL!!',
       ultimateReadyHint:'Charged up! Tap again!',
       ultimateHitText:'ULTIMATE!!!',
@@ -1229,6 +1434,7 @@
     });
     langBtn.textContent = currentLang === 'ko' ? 'English' : '한국어';
     renderWeaponBar();
+    if(typeof renderVibBtn === 'function') renderVibBtn();
   }
 
   const langBtn = document.getElementById('langBtn');
@@ -1424,9 +1630,9 @@
   /* ---------------- CUSTOMIZATION ---------------- */
   const look = {
     gender:'neutral',
-    skin:'#ffd400', hair:'#151316', hairLength:35,
-    eye:'#151316', eyeSize:100, noseSize:90,
-    lip:'#151316', lipSize:100,
+    skin:'#f0c4a0', hair:'#2b1d14', hairLength:35,
+    eye:'#4a2e1a', eyeSize:100, noseSize:90,
+    lip:'#b5524f', lipSize:100,
     bodyWidth:82, muscle:35,
     beard:false, chubby:0, earSize:100,
     faceShape:'oval', freckles:false, mole:false
@@ -1492,36 +1698,36 @@
   // 매끄럽게 늘어남 (예전 "정수리 캡 + 귀 옆 가닥" 분리형 구조라 길이를
   // 바꾸면 귀만 늘어나는 것처럼 보이던 문제를 근본적으로 해결)
   function hairPathD(sideY){
-    return `M50,-3
-      C64,-4 74,-2 78,4
-      C84,8 84,14 82,20
-      C88,24 90,30 88,${sideY-6}
-      L86,${sideY}
-      C84,${sideY+5} 78,${sideY+2} 76,${sideY-10}
-      C74,${sideY-20} 74,10 72,2
-      C70,-2 60,-4 50,-3
-      C40,-4 30,-2 28,2
-      C26,10 26,${sideY-20} 24,${sideY-10}
-      C22,${sideY+2} 16,${sideY+5} 14,${sideY}
-      L12,${sideY-6}
-      C10,30 12,24 18,20
-      C16,14 16,8 22,4
-      C26,-2 36,-4 50,-3 Z`;
+    // 윗머리를 덮는 풍성한 헤어 + 이마 라인(앞머리) + 옆머리
+    return `M50,-7
+      C68,-8 84,-2 88,12
+      C91,20 90,28 88,${sideY-4}
+      L85,${sideY}
+      C82,${sideY+4} 77,${sideY+1} 76,${sideY-10}
+      C75,${sideY-20} 76,30 74,24
+      C68,16 60,13 50,14
+      C40,13 32,16 26,24
+      C24,30 25,${sideY-20} 24,${sideY-10}
+      C23,${sideY+1} 18,${sideY+4} 15,${sideY}
+      L12,${sideY-4}
+      C10,28 9,20 12,12
+      C16,-2 32,-8 50,-7 Z`;
   }
   function hairStrand1D(sideY){
     const y = 8 + sideY*0.5;
-    return `M30,4 C27,${y*0.5} 25,${y*0.8} 24,${y}`;
+    return `M34,-3 C26,2 24,${y*0.5} 24,${y}`;
   }
   function hairStrand2D(sideY){
     const y = 8 + sideY*0.5;
-    return `M70,4 C73,${y*0.5} 75,${y*0.8} 76,${y}`;
+    return `M66,-3 C74,2 76,${y*0.5} 76,${y}`;
   }
 
   function applyLook(){
     [els.pv, els.gm].forEach(el=>{
-      el.torso.style.background = look.skin;
-      el.neck.style.background = look.skin;
-      el.body.style.background = look.skin;
+      el.torso.style.backgroundColor = look.skin;
+      el.neck.style.backgroundColor = look.skin;
+      el.body.style.backgroundColor = look.skin;
+      el.body.style.setProperty('--skin', look.skin);
 
       // 체형(허리 폭) + 근육량(어깨 폭)을 함께 반영해 몸통 너비를 계산
       const bodyW = Math.min(100, look.bodyWidth * 0.9 + look.muscle * 0.22);
@@ -1535,14 +1741,14 @@
       const chinH = look.chubby * 0.13;
       el.chin.style.width = chinW + '%';
       el.chin.style.height = chinH + '%';
-      el.chin.style.background = look.skin;
+      el.chin.style.backgroundColor = look.skin;
       el.chin.style.opacity = look.chubby > 5 ? Math.min(1, look.chubby/70) : 0;
 
       // 귀
       const earSizePct = 14 * (look.earSize/100);
       [el.earL, el.earR].forEach(ear=>{
         ear.style.width = earSizePct + '%';
-        ear.style.background = look.skin;
+        ear.style.backgroundColor = look.skin;
       });
 
       // 주근깨 / 점
@@ -1554,6 +1760,8 @@
       const sideY = 14 + look.hairLength * 0.5; // 14(짧음) ~ 64(길게)
       el.hairPath.setAttribute('d', hairPathD(sideY));
       el.hairPath.setAttribute('fill', look.hair);
+      const shine = el.torso.querySelector('.hairShine');
+      if(shine){ shine.setAttribute('d', hairPathD(sideY)); shine.style.opacity = hasHair ? 1 : 0; }
       el.hairPath.style.opacity = hasHair ? 1 : 0;
       const strandColor = lightenHex(look.hair, 0.45);
       [el.strand1, el.strand2].forEach((s, i)=>{
@@ -1563,17 +1771,17 @@
       });
 
       // 수염
-      el.beard.style.background = look.hair;
+      el.beard.style.backgroundColor = look.hair;
       el.beard.style.opacity = look.beard ? 1 : 0;
 
       // 눈/눈썹/쌍꺼풀은 고정된 중심(38%/62%)을 기준으로 크기만 변하고,
       // 눈썹은 눈 크기와 무관하게 항상 일정한 간격을 유지하도록 직접 계산
       // (예전엔 눈이 커지면 눈썹과 겹치는 버그가 있었음)
-      const eyeSizePct = 16 * (look.eyeSize/100) * 0.6; // torso 기준 실제 폭(%)
+      const eyeSizePct = 16 * (look.eyeSize/100) * 0.78; // torso 기준 실제 폭(%)
       const browGap = 5.5;
       const browWidthPct = 9;
       [[el.eyeL, el.browL, el.lidL, 38], [el.eyeR, el.browR, el.lidR, 62]].forEach(([eyeEl, browEl, lidEl, centerX])=>{
-        const eyeTop = 32 - eyeSizePct/2;
+        const eyeTop = 40 - eyeSizePct*0.31;
         eyeEl.style.width = eyeSizePct + '%';
         eyeEl.style.left = (centerX - eyeSizePct/2) + '%';
         eyeEl.style.top = eyeTop + '%';
@@ -1587,19 +1795,20 @@
         lidEl.style.left = (centerX - lidW/2) + '%';
         lidEl.style.top = (eyeTop - lidH*0.45) + '%';
       });
-      el.pupil1.style.background = look.eye; el.pupil2.style.background = look.eye;
+      el.pupil1.style.setProperty('--iris', look.eye); el.pupil2.style.setProperty('--iris', look.eye);
+      [el.browL, el.browR].forEach(b=> b.style.setProperty('--hairc', look.hair));
 
       const noseSizePx = Math.round(look.noseSize * 0.16);
       el.nose.style.width = noseSizePx + 'px';
       el.nose.style.height = Math.round(noseSizePx*0.8) + 'px';
 
       const lipScale = look.lipSize/100;
-      const mouthW = 34 * lipScale;
+      const mouthW = 26 * lipScale;
       el.mouth.style.width = Math.round(mouthW) + '%';
-      el.mouth.style.height = Math.round(12 * lipScale) + '%';
+      el.mouth.style.height = Math.round(5 * lipScale) + '%';
       el.mouth.style.borderColor = look.lip;
-      el.mouth.style.borderWidth = Math.round(4 + lipScale*3) + 'px';
-      el.mouth.style.background = look.skin;
+      el.mouth.style.borderWidth = Math.max(2, Math.round(1 + lipScale*2)) + 'px';
+      el.mouth.style.backgroundColor = look.skin;
     });
   }
 
@@ -2036,6 +2245,8 @@
     broom:  { crack:true, crackFreq:3600, body:true, bodyFreq:1900, bodyFilterType:'highpass',
               bodyGain:0.25, bodyDur:0.18, bodyDecay:1.5 },
     toiletpaper:{ body:true, bodyFreq:650, bodyGain:0.22, bodyDur:0.15, bodyDecay:2.0 },
+    goldhammer:{ crack:true, crackFreq:2800, ring:true, ringFreq:1800,
+              tone:true, wave:'sine', freq:520, freqRatio:0.6, toneDur:0.3, toneGain:0.45 },
     keyboard:{ clicks:5 },
     chicken:{ crack:true, crackFreq:1800,
               tone:true, wave:'square', freq:520, freqRatio:1.5, toneDur:0.15, toneGain:0.35,
@@ -2240,6 +2451,7 @@
     {key:'fart', emoji:'💨', type:'gross'},
     {key:'sock', emoji:'🧦', type:'gross'},
     {key:'sax', emoji:'🎷', type:'musical'},
+    {key:'goldhammer', emoji:'🏆', type:'blunt', hidden:true},
     {key:'santabat', emoji:'🎅', type:'blunt', season:'dec'},
     {key:'pumpkin', emoji:'🎃', type:'blunt', season:'oct'},
     {key:'roses', emoji:'🌹', type:'blunt', season:'feb'},
@@ -2259,18 +2471,18 @@
     return true;
   }
   function activeWeaponDefs(){
-    return WEAPON_DEFS.filter(w => isInSeason(w.season));
+    return WEAPON_DEFS.filter(w => isInSeason(w.season) && (!w.hidden || isWeaponUnlocked(w.key)));
   }
 
-  const TYPE_REACT_ICON = { wet:'😱', gross:'🤢', musical:'😵', party:'😲', extinguish:'😨', gust:'😮' };
+  const TYPE_REACT_ICON = { wet:1, gross:1, musical:1, party:1, extinguish:1, gust:1 };
   const TYPE_DEBRIS = {
-    blunt:['⭐','💛','🧵','🪶','📎','💥','✨'],
-    wet:['💦','💧','🫧'],
-    gross:['💨','🌫️'],
-    musical:['🎵','🎶'],
-    party:['🎊','🎉','✨'],
-    extinguish:['❄️','💨'],
-    gust:['💨','🍃'],
+    blunt:['#ffd23f','#ff7a3d','#ffffff','#ff4d6d'],
+    wet:['#7fd3ff','#bfe9ff','#ffffff'],
+    gross:['#b8d86b','#d9e8a0','#9bbf4a'],
+    musical:['#8b5cf6','#c4b0ff','#ffd23f'],
+    party:['#ff2f6e','#ffd23f','#3ec6ff','#7ee081'],
+    extinguish:['#ffffff','#cfe9ff','#e8f4ff'],
+    gust:['#e8f4f0','#ffffff','#cfe3da'],
   };
   const TYPE_BURST_KEY = { wet:'burstWet', gross:'burstGross', musical:'burstMusical', party:'burstParty', extinguish:'burstHiss', gust:'burstGust' };
 
@@ -2281,10 +2493,10 @@
       const raw = localStorage.getItem(PROGRESS_KEY);
       if(raw){
         const p = JSON.parse(raw);
-        return { gamesPlayed:p.gamesPlayed||0, totalHits:p.totalHits||0, bestCombo:p.bestCombo||0 };
+        return { gamesPlayed:p.gamesPlayed||0, totalHits:p.totalHits||0, bestCombo:p.bestCombo||0, missionsDone:p.missionsDone||0, daily:p.daily||null };
       }
     }catch(e){ /* localStorage unavailable — just play unlocked-from-scratch */ }
-    return { gamesPlayed:0, totalHits:0, bestCombo:0 };
+    return { gamesPlayed:0, totalHits:0, bestCombo:0, missionsDone:0, daily:null };
   }
   function saveProgress(){
     try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){ /* ignore */ }
@@ -2309,6 +2521,7 @@
     fart: p=>p.gamesPlayed>=8,
     sock: p=>p.gamesPlayed>=8,
     sax: p=>p.bestCombo>=40,
+    goldhammer: p=>(p.missionsDone||0)>=5,
   };
   function isWeaponUnlocked(key){
     if(WEAPON_MAP[key] && WEAPON_MAP[key].season) return true; // 시즌 무기는 잠금 없음
@@ -2400,13 +2613,191 @@
     else if(combo >= 5) arena.classList.add('combo-tier-1');
   }
 
+  /* ---------------- 진동 피드백 ---------------- */
+  const SETTINGS_KEY = 'stressSmashSettings_v1';
+  let vibrateOn = true;
+  try{ const st = JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}'); if(st.vibrate === false) vibrateOn = false; }catch(e){}
+  const vibBtn = document.getElementById('vibBtn');
+  const vibSupported = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+  function vib(pattern){
+    if(!vibrateOn || !vibSupported) return;
+    try{ navigator.vibrate(pattern); }catch(e){}
+  }
+  function renderVibBtn(){ vibBtn.textContent = vibrateOn ? '📳' : '📴'; vibBtn.title = vibrateOn ? t('vibOn') : t('vibOff'); }
+  vibBtn.addEventListener('click', ()=>{
+    vibrateOn = !vibrateOn;
+    try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify({vibrate:vibrateOn})); }catch(e){}
+    renderVibBtn();
+    vib(40);
+  });
+  renderVibBtn();
+
+  /* ---------------- 피버 타임 ---------------- */
+  const FEVER_COMBO = 8, FEVER_MS = 5000;
+  const feverBanner = document.getElementById('feverBanner');
+  let feverActive = false, feverTimer = null, feverCountThisGame = 0, critsThisGame = 0, koThisGame = false;
+  function startFever(){
+    feverActive = true; feverCountThisGame++;
+    feverBanner.textContent = t('feverText');
+    feverBanner.classList.add('show');
+    arena.classList.add('fever');
+    vib([60,40,60,40,120]);
+    clearTimeout(feverTimer);
+    feverTimer = setTimeout(endFever, FEVER_MS);
+  }
+  function endFever(){
+    clearTimeout(feverTimer);
+    feverActive = false;
+    feverBanner.classList.remove('show');
+    arena.classList.remove('fever');
+  }
+
+  /* ---------------- 일일 미션 ---------------- */
+  const MISSION_POOL = [
+    { id:'hits',   metric:'hits',   goal:80 },
+    { id:'combo',  metric:'combo',  goal:12 },
+    { id:'crits',  metric:'crits',  goal:5 },
+    { id:'fever',  metric:'fever',  goal:2 },
+    { id:'unique', metric:'unique', goal:5 },
+    { id:'ko',     metric:'ko',     goal:2 },
+    { id:'games',  metric:'games',  goal:3 },
+  ];
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function ensureDaily(){
+    const today = todayStr();
+    if(!progress.daily || progress.daily.date !== today){
+      let seed = 0; for(const ch of today) seed = (seed*31 + ch.charCodeAt(0)) >>> 0;
+      const ids = MISSION_POOL.map(m=>m.id);
+      const picked = [];
+      while(picked.length < 3){
+        seed = (seed*1664525 + 1013904223) >>> 0;
+        const id = ids[seed % ids.length];
+        if(!picked.includes(id)) picked.push(id);
+      }
+      progress.daily = { date:today, ids:picked, prog:{}, done:{} };
+      saveProgress();
+    }
+    return progress.daily;
+  }
+  const missionToast = document.getElementById('missionToast');
+  let toastTimer = null;
+  function showToast(msg){
+    missionToast.textContent = msg;
+    missionToast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> missionToast.classList.remove('show'), 2600);
+  }
+  // 한 판이 끝날 때 호출: 판 결과를 미션 진행도에 반영
+  function updateMissionsAfterGame(stats){
+    const d = ensureDaily();
+    const msgs = [];
+    d.ids.forEach(id=>{
+      if(d.done[id]) return;
+      const def = MISSION_POOL.find(m=>m.id===id);
+      const cur = d.prog[id] || 0;
+      let next = cur;
+      if(def.metric==='hits') next = cur + stats.hits;
+      else if(def.metric==='combo') next = Math.max(cur, stats.maxCombo);
+      else if(def.metric==='crits') next = cur + stats.crits;
+      else if(def.metric==='fever') next = cur + stats.fever;
+      else if(def.metric==='unique') next = Math.max(cur, stats.unique);
+      else if(def.metric==='ko') next = cur + (stats.ko ? 1 : 0);
+      else if(def.metric==='games') next = cur + 1;
+      d.prog[id] = Math.min(def.goal, next);
+      if(d.prog[id] >= def.goal){
+        d.done[id] = true;
+        progress.missionsDone = (progress.missionsDone||0) + 1;
+        msgs.push(t('missionDone') + ' ' + t('missions')[id].replace('{n}', def.goal));
+      }
+    });
+    if(d.ids.every(id=>d.done[id]) && msgs.length) msgs.push(t('missionAllDone'));
+    const wasLocked = !(UNLOCK_RULES.goldhammer(Object.assign({}, progress, {missionsDone:(progress.missionsDone||0) - msgs.filter(m=>m.startsWith(t('missionDone'))).length})));
+    if(wasLocked && isWeaponUnlocked('goldhammer')) msgs.push(t('hiddenUnlocked'));
+    saveProgress();
+    if(msgs.length){ vib([80,50,80,50,200]); showToast(msgs.join('  ')); }
+  }
+  const missionModal = document.getElementById('missionModal');
+  function renderMissions(){
+    const d = ensureDaily();
+    const list = document.getElementById('missionList');
+    list.innerHTML = '';
+    d.ids.forEach(id=>{
+      const def = MISSION_POOL.find(m=>m.id===id);
+      const cur = d.prog[id] || 0;
+      const item = document.createElement('div');
+      item.className = 'missionItem' + (d.done[id] ? ' done' : '');
+      const label = document.createElement('div');
+      label.textContent = (d.done[id] ? '[완료] ' : '') + t('missions')[id].replace('{n}', def.goal) + '  (' + cur + '/' + def.goal + ')';
+      const bar = document.createElement('div'); bar.className = 'mbar';
+      const fill = document.createElement('i'); fill.style.width = Math.round(cur/def.goal*100) + '%';
+      bar.appendChild(fill);
+      item.appendChild(label); item.appendChild(bar);
+      list.appendChild(item);
+    });
+    document.getElementById('missionHint').textContent =
+      isWeaponUnlocked('goldhammer') ? t('missionHintUnlocked') : t('missionHintText').replace('{n}', progress.missionsDone||0);
+  }
+  document.getElementById('missionBtn').addEventListener('click', ()=>{ renderMissions(); missionModal.classList.add('show'); });
+  document.getElementById('missionClose').addEventListener('click', ()=> missionModal.classList.remove('show'));
+  missionModal.addEventListener('click', (e)=>{ if(e.target === missionModal) missionModal.classList.remove('show'); });
+
+  /* ---------------- 약점 포인트 + 데미지 숫자 ---------------- */
+  let weakEl = null, weakTimer = null, weakHitsThisGame = 0, roundMod = null;
+  function clearWeak(){ clearTimeout(weakTimer); if(weakEl){ weakEl.remove(); weakEl = null; } }
+  function scheduleWeak(){
+    clearTimeout(weakTimer);
+    if(!running) return;
+    weakTimer = setTimeout(()=>{ if(running) spawnWeak(); }, roundMod === 'lucky' ? 1200 + Math.random()*1200 : 3500 + Math.random()*2500);
+  }
+  function spawnWeak(){
+    if(!running || weakEl) return;
+    const a = arena.getBoundingClientRect(), h = gmTorso.getBoundingClientRect();
+    if(!h.width) { scheduleWeak(); return; }
+    const x = h.left - a.left + h.width*(0.22 + Math.random()*0.56);
+    const y = h.top - a.top + h.height*(0.2 + Math.random()*0.6);
+    weakEl = document.createElement('div');
+    weakEl.className = 'weakPoint';
+    weakEl.style.left = x + 'px'; weakEl.style.top = y + 'px';
+    weakEl.dataset.x = x; weakEl.dataset.y = y;
+    arena.appendChild(weakEl);
+    weakTimer = setTimeout(()=>{ clearWeak(); scheduleWeak(); }, 1800);
+  }
+  // 클릭이 약점 근처인지 확인. 맞으면 제거하고 true
+  function checkWeakHit(x, y){
+    if(!weakEl) return false;
+    const dx = x - parseFloat(weakEl.dataset.x), dy = y - parseFloat(weakEl.dataset.y);
+    if(dx*dx + dy*dy > 44*44) return false;
+    clearWeak(); weakHitsThisGame++; scheduleWeak();
+    return true;
+  }
+  function showDmgNum(x, y, dmg, kind){
+    const el = document.createElement('div');
+    el.className = 'dmgNum' + (kind ? ' ' + kind : '');
+    el.textContent = (kind==='weak' ? t('weakText') + ' ' : '') + '-' + dmg;
+    el.style.left = (x - 14 + Math.random()*20) + 'px'; el.style.top = (y - 40) + 'px';
+    arena.appendChild(el);
+    requestAnimationFrame(()=>{ el.style.transform = 'translateY(-46px) scale(1.15)'; el.style.opacity = '0'; });
+    setTimeout(()=> el.remove(), 650);
+  }
+
   function resetGame(){
     comboDecayMs = difficulty === 'hard' ? 650 : 900;
     stress = 100; combo = 0; maxCombo = 0; timeLeft = difficulty === 'hard' ? 20 : 30;
+    roundMod = null;
+    if(gameMode === 'normal' || gameMode === 'coop'){
+      const mods = ['lucky','bonus','rage', null];
+      roundMod = mods[Math.floor(Math.random()*mods.length)];
+      if(roundMod === 'bonus') timeLeft += 8;
+    }
     weaponCount = {}; milestonesHit = new Set();
     currentExprLevel = 0;
     hitsThisGame = 0; comboResetCount = 0; grossHitsThisGame = 0;
     resetUltimate();
+    clearWeak(); weakHitsThisGame = 0;
+    endFever(); feverCountThisGame = 0; critsThisGame = 0; koThisGame = false;
     gaugeFill.style.width = '100%';
     timeLeftEl.textContent = timeLeft;
     comboLabel.textContent = 'COMBO 0';
@@ -2426,7 +2817,7 @@
     signBoard.textContent = '"' + (enteredReason || t('reasonDefault')) + '"';
     if('speechSynthesis' in window) window.speechSynthesis.cancel();
     if(activePowerup){ activePowerup.remove(); activePowerup = null; }
-    clearTimeout(powerupTimer);
+    clearTimeout(powerupTimer); clearWeak();
   }
 
   beginBtn.addEventListener('click', () => {
@@ -2463,7 +2854,8 @@
     running = true;
     startTimer();
     startBGM();
-    schedulePowerup();
+    schedulePowerup(); scheduleWeak();
+    if(roundMod){ showToast(t('modTitle') + ' - ' + t({lucky:'modLucky',bonus:'modBonus',rage:'modRage'}[roundMod])); }
     if(gameMode === 'boss') scheduleBossEvent();
   });
 
@@ -2526,12 +2918,13 @@
     turnBanner.style.display = 'none';
 
     resetGame();
+    roundMod = null;
     timeLeft = 15;
     timeLeftEl.textContent = timeLeft;
     running = true;
     startTimer();
     startBGM();
-    schedulePowerup();
+    schedulePowerup(); scheduleWeak();
   }
 
   function handleStoryStageEnd(stressDrop, calmGain){
@@ -2577,7 +2970,7 @@
         wasRunningBeforeHidden = true;
         clearInterval(timerId);
         stopBGM();
-        clearTimeout(powerupTimer);
+        clearTimeout(powerupTimer); clearWeak();
         clearTimeout(bossEventTimer);
         clearTimeout(bossCounterTimeout);
         bossCounterWindowActive = false;
@@ -2590,7 +2983,7 @@
         if(audioCtx) audioCtx.resume();
         startTimer();
         startBGM();
-        schedulePowerup();
+        schedulePowerup(); scheduleWeak();
         if(gameMode === 'boss') scheduleBossEvent();
       }
     }
@@ -2609,9 +3002,10 @@
     running = false;
     clearInterval(timerId);
     stopBGM();
-    clearTimeout(powerupTimer);
+    clearTimeout(powerupTimer); clearWeak();
     clearTimeout(bossEventTimer);
     clearTimeout(bossCounterTimeout);
+    endFever();
     bossCounterWindowActive = false;
     bossWarning.style.display = 'none';
     if(activePowerup){ activePowerup.remove(); activePowerup = null; }
@@ -2625,10 +3019,12 @@
     const uniqueWeapons = Object.keys(weaponCount).length;
 
     // 진행도 저장 (무기 잠금해제용)
+    const prevBest = progress.bestCombo;
     progress.gamesPlayed += 1;
     progress.totalHits += hitsThisGame;
     progress.bestCombo = Math.max(progress.bestCombo, maxCombo);
     saveProgress();
+    updateMissionsAfterGame({ hits:hitsThisGame, maxCombo, crits:critsThisGame, fever:feverCountThisGame, unique:uniqueWeapons, ko:!!finisher });
 
     // 플레이 스타일 기반 칭호 계산
     let styleTitleKey = null;
@@ -2659,6 +3055,13 @@
           ? (enteredName || t('emptyNameFallback')) + t('resultTitleSuffix') + ' (' + enteredName2 + ' & ' + (enteredName||'P1') + ')'
           : targetName.textContent + t('resultTitleSuffix');
       document.getElementById('resultHeadline').textContent = t('headlines')[headlineKey];
+      const score = stressDrop + maxCombo*2;
+      const grade = score >= 140 ? 'S' : (score >= 115 ? 'A' : (score >= 85 ? 'B' : 'C'));
+      const gb = document.getElementById('gradeBadge');
+      gb.textContent = grade; gb.className = 'gradeBadge g-' + grade;
+      const rn = document.getElementById('recordNote');
+      if(maxCombo > prevBest && prevBest > 0){ rn.textContent = t('newRecord') + ' ' + maxCombo; rn.style.display = 'inline-block'; }
+      else rn.style.display = 'none';
       document.getElementById('stressResult').textContent = '-' + stressDrop;
       document.getElementById('calmResult').textContent = '+' + calmGain;
       document.getElementById('comboResult').textContent = maxCombo;
@@ -2874,7 +3277,7 @@
     const type = def.type;
     const fx = document.createElement('div');
     fx.className = 'weapon-fx';
-    fx.textContent = def.emoji;
+    fx.textContent = '';
     fx.style.left = (x - 23) + 'px';
     fx.style.top = (y - 23) + 'px';
     fx.style.transform = 'scale(0.4) rotate(' + (Math.random()*40-20) + 'deg)';
@@ -2909,13 +3312,14 @@
     setTimeout(()=> burst.remove(), 500);
 
     const debrisPool = TYPE_DEBRIS[type];
-    const count = 3 + intensity*2;
+    const count = 5 + intensity*3;
     for(let i=0;i<count;i++){
       const d = document.createElement('div');
       d.className = 'debris';
-      d.textContent = debrisPool[Math.floor(Math.random()*debrisPool.length)];
+      d.style.background = debrisPool[Math.floor(Math.random()*debrisPool.length)];
       d.style.left = x + 'px';
       d.style.top = y + 'px';
+      d.style.width = d.style.height = (5 + Math.random()*7) + 'px';
       d.style.transition = 'transform .5s ease-out, opacity .5s ease-out';
       arena.appendChild(d);
       const angle = Math.random()*Math.PI*2;
@@ -2927,22 +3331,7 @@
       setTimeout(()=> d.remove(), 520);
     }
 
-    // extra reaction icon above the head for non-blunt weapon types (variety cue)
     if(TYPE_REACT_ICON[type]){
-      const arenaRect = arena.getBoundingClientRect();
-      const ri = document.createElement('div');
-      ri.className = 'reactIcon';
-      ri.textContent = TYPE_REACT_ICON[type];
-      ri.style.left = (arenaRect.width/2) + 'px';
-      ri.style.top = (arenaRect.height*0.16) + 'px';
-      arena.appendChild(ri);
-      requestAnimationFrame(()=>{
-        ri.style.opacity = '1';
-        ri.style.transform = 'translate(-50%,-50%) scale(1.1)';
-      });
-      setTimeout(()=>{ ri.style.opacity='0'; ri.style.transform='translate(-50%,-50%) scale(0.7)'; }, 380);
-      setTimeout(()=> ri.remove(), 650);
-
       if(type==='gross') gmTorso.classList.add('reaction-gross');
       if(type==='wet') gmTorso.classList.add('reaction-wet');
       setTimeout(()=>{ gmTorso.classList.remove('reaction-gross','reaction-wet'); }, 400);
@@ -3039,9 +3428,9 @@
 
   /* ---------------- 파워업 아이템: 짧게 나타났다 사라지는 보너스 아이콘 ---------------- */
   const POWERUP_TYPES = [
-    { key:'time', emoji:'⏱️' },
-    { key:'ultimate', emoji:'⚡' },
-    { key:'bighit', emoji:'💥' },
+    { key:'time', emoji:'TIME' },
+    { key:'ultimate', emoji:'ULT' },
+    { key:'bighit', emoji:'BIG' },
   ];
 
   function schedulePowerup(){
@@ -3136,6 +3525,7 @@
     }, comboDecayMs);
 
     playUltimateSound();
+    vib([100,30,150]);
     screenFlash(0.6);
     document.body.classList.add('screenshake');
     setTimeout(()=> document.body.classList.remove('screenshake'), 320);
@@ -3157,13 +3547,13 @@
     setTimeout(()=> el.remove(), 1000);
 
     // big debris burst for extra spectacle
-    const debrisPool = ['⭐','💥','✨','💫','🎇'];
+    const debrisPool = ['#ffd23f','#ff4d6d','#ffffff','#8b5cf6','#3ec6ff'];
     for(let i=0;i<14;i++){
       const d = document.createElement('div');
       d.className = 'debris';
-      d.textContent = debrisPool[Math.floor(Math.random()*debrisPool.length)];
+      d.style.background = debrisPool[Math.floor(Math.random()*debrisPool.length)];
       d.style.left = x + 'px'; d.style.top = y + 'px';
-      d.style.fontSize = '26px';
+      d.style.width = d.style.height = (7 + Math.random()*9) + 'px';
       d.style.transition = 'transform .6s ease-out, opacity .6s ease-out';
       arena.appendChild(d);
       const angle = Math.random()*Math.PI*2;
@@ -3242,6 +3632,8 @@
 
     const intensity = combo >= 20 ? 2 : (combo >= 8 ? 1 : 0);
     const isCrit = Math.random() < 0.1;
+    if(isCrit) critsThisGame++;
+    if(!feverActive && combo > 0 && combo % FEVER_COMBO === 0) startFever();
 
     const weaponKey = selectedWeaponKey === 'random'
       ? (()=>{ const pool = activeWeaponDefs(); return pool[Math.floor(Math.random()*pool.length)].key; })()
@@ -3255,12 +3647,18 @@
     spawnBruise(e.clientX ?? (rect.left+rect.width/2), e.clientY ?? (rect.top+rect.height/2), intensity);
     playHitSound(weaponKey, weaponType, intensity);
     if(isCrit) playCritSound();
+    vib(isCrit ? [30,20,60] : (intensity===2 ? 35 : 18));
     playYelp(intensity);
     showMilestone(combo);
     maybeShowTaunt();
 
     let dmg = 2 + Math.min(8, Math.floor(combo/3)) + intensity*2;
     if(isCrit) dmg *= 2;
+    const weakHit = checkWeakHit(x, y);
+    if(weakHit){ dmg *= 3; vib([40,30,90]); }
+    if(roundMod === 'rage') dmg = Math.round(dmg * 1.3);
+    if(feverActive) dmg = Math.round(dmg * 1.5);
+    if(weaponKey === 'goldhammer') dmg = Math.round(dmg * 1.5);
 
     dummy.classList.remove('shake','shake-hard','flyback','squash','gust','critZoom');
     void dummy.offsetWidth;
@@ -3270,13 +3668,14 @@
     else if(combo % 2 === 0){ dummy.classList.add('flyback'); }
     else { dummy.classList.add('squash'); }
 
-    addUltimateCharge(isCrit ? 18 : 10);
+    addUltimateCharge((isCrit ? 18 : 10) * (feverActive ? 2 : 1));
 
     if(combo % 6 === 0){
       document.body.classList.add('shake');
       setTimeout(()=> document.body.classList.remove('shake'), 280);
     }
 
+    showDmgNum(x, y, dmg, weakHit ? 'weak' : (isCrit ? 'crit' : ''));
     applyDamageCommon(dmg);
   });
 
